@@ -1,7 +1,7 @@
-// app/api/posts/route.ts
 import Post from "@/models/post.model";
 import { connect_DB } from "@/utils/DB";
 import { NextResponse } from "next/server";
+import { getCategoryClassifyPrompt, askGemini } from "@/utils/AI";
 
 export async function POST(request: Request) {
   // Connect to MongoDB
@@ -28,13 +28,24 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Create the new post
+    // Generate a detailed prompt from the post content
+    const prompt = getCategoryClassifyPrompt(content);
+    // Call the Gemini API to get suggested categories and tags
+    const aiResult = await askGemini(prompt);
+    // Append the AI-suggested categories to those passed in from the client.
+    // You can choose to override or merge; here we merge them.
+    const finalCategories = Array.from(
+      new Set([...categories, ...aiResult.categories])
+    );
+    const finalTags = Array.from(new Set([...tags, ...aiResult.tags]));
+
+    // Create the new post with the merged categories and tags.
     const newPost = await Post.create({
       title,
       content,
       author,
-      categories,
-      tags,
+      categories: finalCategories,
+      tags: finalTags,
       images,
       isPublished,
       // likes, views, commentCount will use default values

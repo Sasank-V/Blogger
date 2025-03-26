@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CommentSection } from "@/components/comment-section";
 import { RelatedPosts } from "@/components/related-posts";
-import { getPostBySlug, getRelatedPosts } from "@/lib/data";
+import { getPostById, getRelatedPosts } from "@/lib/data";
 
 interface BlogPostPageProps {
   params: {
@@ -21,7 +21,8 @@ interface BlogPostPageProps {
 export async function generateMetadata({
   params,
 }: BlogPostPageProps): Promise<Metadata> {
-  const post = await getPostBySlug(params.slug);
+  console.log(params.slug);
+  const post = await getPostById(params.slug);
 
   if (!post) {
     return {
@@ -32,17 +33,15 @@ export async function generateMetadata({
 
   return {
     title: post.title,
-    description: post.excerpt,
     openGraph: {
       title: post.title,
-      description: post.excerpt,
-      images: [{ url: post.coverImage }],
+      images: [{ url: (post.images.length > 0 && post.images[0]) || "" }],
     },
   };
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = await getPostBySlug(params.slug);
+  const post = await getPostById(params.slug);
 
   if (!post) {
     notFound();
@@ -64,37 +63,40 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
             {post.title}
           </h1>
-          <p className="text-xl text-muted-foreground">{post.excerpt}</p>
+          <p className="text-xl text-muted-foreground">{post.title}</p>
           <div className="flex items-center justify-center gap-4">
             <div className="flex items-center gap-2">
               <Avatar>
-                <AvatarImage src={post.author.image} alt={post.author.name} />
-                <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
+                <AvatarImage
+                  src={post.author.avatar}
+                  alt={post.author.username}
+                />
+                <AvatarFallback>
+                  {post.author.username.charAt(0)}
+                </AvatarFallback>
               </Avatar>
               <div className="flex flex-col items-start">
                 <Link
                   href={`/profile/${post.author.username}`}
                   className="font-medium hover:underline"
                 >
-                  {post.author.name}
+                  {post.author.username}
                 </Link>
                 <time className="text-sm text-muted-foreground">
-                  {formatDistanceToNow(new Date(post.publishedAt), {
+                  {formatDistanceToNow(new Date(post.createdAt), {
                     addSuffix: true,
                   })}
                 </time>
               </div>
             </div>
             <Separator orientation="vertical" className="h-6" />
-            <div className="text-sm text-muted-foreground">
-              {post.readingTime} min read
-            </div>
+            <div className="text-sm text-muted-foreground">{"5"} min read</div>
           </div>
         </div>
 
         <div className="relative aspect-video mb-8">
           <Image
-            src={post.coverImage || "/placeholder.svg?height=600&width=1200"}
+            src={post.images[0] || "/placeholder.svg?height=600&width=1200"}
             alt={post.title}
             fill
             className="object-cover rounded-lg"
@@ -128,7 +130,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
         </div>
 
-        <CommentSection postId={post.id} comments={post.comments} />
+        <CommentSection postId={post.id} />
       </article>
 
       <div className="max-w-4xl mx-auto mt-16">

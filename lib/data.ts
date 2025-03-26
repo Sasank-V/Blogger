@@ -5,6 +5,7 @@ import type {
   UserStats,
   GetPostsParams,
   GetPostsResponse,
+  Comment,
 } from "@/lib/types";
 
 // Mock data functions
@@ -61,81 +62,57 @@ export async function getUserPosts(userId: string): Promise<Post[]> {
   return data.posts; // assuming the API returns { posts: Post[] }
 }
 
-export async function getPostBySlug(slug: string): Promise<Post | null> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 300));
+//Done
+export async function getPostById(postId: string): Promise<Post | null> {
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/post/${postId}/get`
+    );
+    if (!res.ok) {
+      console.error("Failed to fetch post data");
+      return null;
+    }
+    const post: Post = await res.json();
+    return post;
+  } catch (error) {
+    console.error("Error fetching post by id:", error);
+    return null;
+  }
+}
 
-  // In a real app, this would fetch the post from an API or database
-  if (slug === "not-found") return null;
+//Done
+export async function getPostCommentsByID(postId: string): Promise<Comment[]> {
+  const res = await fetch(`/api/post/${postId}/comments/get`);
+  if (!res.ok) {
+    throw new Error("Failed to fetch comments");
+  }
+  const data = await res.json();
+  return data.comments; // assuming the API returns { comments: Comment[] }
+}
 
-  return {
-    id: "post-1",
-    title: "Understanding the Next.js App Router",
-    slug,
-    excerpt:
-      "Learn how the new App Router in Next.js works and how to leverage its power for your applications.",
-    content: `
-      <p>The App Router is a new paradigm introduced in Next.js 13 that offers a more intuitive and powerful way to handle routing in your applications.</p>
-      <h2>Key Features</h2>
-      <ul>
-        <li>Server Components by default</li>
-        <li>Nested layouts</li>
-        <li>Simplified data fetching</li>
-        <li>Streaming and Suspense</li>
-      </ul>
-      <p>With the App Router, you can create more complex layouts with less code, and take advantage of React Server Components for improved performance.</p>
-      <h2>Getting Started</h2>
-      <p>To use the App Router, create an <code>app</code> directory in your project. This directory will contain all your routes, layouts, and pages.</p>
-      <p>Each folder represents a route segment, and you can create special files like <code>page.js</code>, <code>layout.js</code>, and <code>loading.js</code> to define the behavior of each route.</p>
-      <h2>Conclusion</h2>
-      <p>The App Router represents a significant improvement in how we build Next.js applications, offering more flexibility, better performance, and a more intuitive mental model for routing.</p>
-    `,
-    coverImage:
-      "/placeholder.svg?height=600&width=1200&text=Next.js+App+Router",
-    author: {
-      id: "author-1",
-      name: "John Doe",
-      username: "johndoe",
-      image: "/placeholder.svg?height=40&width=40&text=JD",
-    },
-    categories: ["Technology", "Web Development"],
-    tags: ["nextjs", "react", "javascript"],
-    publishedAt: new Date(Date.now() - 86400000).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000).toISOString(),
-    status: "published",
-    likes: 42,
-    viewCount: 567,
-    commentCount: 8,
-    readingTime: 5,
-    comments: [
-      {
-        id: "comment-1",
-        content:
-          "Great post! I've been using the App Router and it's a game changer.",
-        createdAt: new Date(Date.now() - 3600000).toISOString(),
-        author: {
-          id: "commenter-1",
-          name: "Jane Smith",
-          username: "janesmith",
-          image: "/placeholder.svg?height=40&width=40&text=JS",
-        },
-        likes: 5,
+export async function updatePost(
+  postId: string,
+  updates: UpdatePostData
+): Promise<{ message: string; post?: any; error?: string }> {
+  try {
+    const response = await fetch(`/api/posts/${postId}/update`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
       },
-      {
-        id: "comment-2",
-        content:
-          "Thanks for explaining this so clearly. I was confused about how layouts work but now it makes sense.",
-        createdAt: new Date(Date.now() - 7200000).toISOString(),
-        author: {
-          id: "commenter-2",
-          name: "Bob Johnson",
-          username: "bobjohnson",
-          image: "/placeholder.svg?height=40&width=40&text=BJ",
-        },
-        likes: 3,
-      },
-    ],
-  };
+      body: JSON.stringify(updates),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to update post");
+    }
+
+    return data;
+  } catch (error) {
+    return { message: "Error updating post", error: (error as Error).message };
+  }
 }
 
 export async function getRelatedPosts(

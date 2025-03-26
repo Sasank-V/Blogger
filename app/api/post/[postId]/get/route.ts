@@ -5,13 +5,12 @@ import Post from "@/models/post.model";
 
 export async function GET(
   request: Request,
-  { params }: { params: { postId: string } }
+  context: { params: { postId: string } }
 ) {
   await connect_DB();
-  const { postId } = params;
+  const { postId } = await Promise.resolve(context.params);
 
   try {
-    // Find the post by ID and populate the 'author' field with selected details
     const post = await Post.findById(postId).populate(
       "author",
       "username email avatar bio"

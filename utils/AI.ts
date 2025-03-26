@@ -1,3 +1,9 @@
+import { GoogleGenAI } from "@google/genai";
+export function filterBackticks(input: string): string {
+  // Remove a leading "```json" (with optional whitespace) and trailing triple backticks.
+  return input.replace(/^```json\s*|```$/g, "").trim();
+}
+
 export const getCategoryClassifyPrompt = (content: string) => {
   return `You are a content categorization and tagging expert. Your task is to analyze the blog post content provided below and suggest appropriate categories and tags. 
 
@@ -19,22 +25,19 @@ export const getCategoryClassifyPrompt = (content: string) => {
 export const askGemini = async (
   prompt: string
 ): Promise<{ categories: string[]; tags: string[] }> => {
-  const geminiResponse = await fetch(process.env.GEMINI_API_URL!, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.GEMINI_API_KEY}`,
-    },
-    body: JSON.stringify({ prompt, max_tokens: 150 }),
-  });
-
-  if (!geminiResponse.ok) {
-    console.error("Gemini API error:", geminiResponse.statusText);
+  try {
+    const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY! });
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: prompt,
+    });
+    // Remove leading/trailing backticks if present:
+    const cleanedText = filterBackticks(response.text!);
+    console.log(cleanedText);
+    const result = JSON.parse(cleanedText);
+    return result; // Expected shape: { categories: string[], tags: string[] }
+  } catch (error) {
+    console.error("Error calling Gemini API", error);
     throw new Error("Error calling Gemini API");
   }
-
-  // Assume Gemini API returns JSON with a property "response" that is a JSON string.
-  const geminiData = await geminiResponse.json();
-  const result = JSON.parse(geminiData.response);
-  return result; // Expected to be of the shape: { categories: string[], tags: string[] }
 };
