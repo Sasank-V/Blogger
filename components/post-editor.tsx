@@ -91,38 +91,12 @@ export function PostEditor() {
       author: session.user.id, // User ID
       categories: [finalCategory],
       tags: formData.tags.split(",").map((tag) => tag.trim()),
-<<<<<<< HEAD
-<<<<<<< HEAD
-      images: [formData.coverImage],
-      isPublished: status === "published" ? true : false,
-=======
       images: formData.coverImage ? [formData.coverImage] : [], // Array of images
       isPublished: status === "published",
->>>>>>> 494c3ecefe62217bc8bcd76e4d9954d65be71322
-=======
-
-      images: formData.coverImage ? [formData.coverImage] : [], // Array of images
-      isPublished: status === "published",
->>>>>>> 746348e26f9de2d1e8e86f68b24c3da2f2f85f35
     };
 
     try {
-      // Save draft to local storage (always do this for drafts)
       if (status === "draft") {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        const draftData = {
-          ...postData,
-          savedAt: new Date().toISOString(),
-        };
-        localStorage.setItem(
-          `draft-${session.user.id}`,
-          JSON.stringify(draftData)
-        );
-=======
-=======
-
->>>>>>> 746348e26f9de2d1e8e86f68b24c3da2f2f85f35
         if (!navigator.onLine) {
           // Save draft locally
           const draftData = {
@@ -154,31 +128,7 @@ export function PostEditor() {
 
         toast.success("Post published successfully!");
         router.push("/dashboard");
-<<<<<<< HEAD
->>>>>>> 494c3ecefe62217bc8bcd76e4d9954d65be71322
-=======
->>>>>>> 746348e26f9de2d1e8e86f68b24c3da2f2f85f35
       }
-
-      // Send the post data to the API
-      const response = await fetch("/api/post/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(postData),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save post");
-      }
-
-      toast.success(
-        status === "published"
-          ? "Post published successfully!"
-          : "Draft saved successfully!"
-      );
-      router.push("/dashboard");
     } catch (error) {
       console.error(error);
       toast.error("Failed to save your post. Please try again.");
