@@ -56,13 +56,6 @@ export function MobileNav() {
                 >
                   Dashboard
                 </Link>
-                <Link
-                  href="/profile"
-                  onClick={() => setOpen(false)}
-                  className="transition-colors hover:text-foreground/80"
-                >
-                  Profile
-                </Link>
               </>
             )}
           </nav>
@@ -70,14 +63,20 @@ export function MobileNav() {
             {status === "authenticated" && session?.user ? (
               <div className="flex flex-col gap-3">
                 <div className="flex items-center gap-2">
-                  {session.user.image && (
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={session.user.image} alt="User Avatar" />
-                      <AvatarFallback>
-                        {session.user.name?.charAt(0) || "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                  )}
+                  <Link href={`/profile/${session.user.id}`}>
+                    {session.user.image && (
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage
+                          src={session.user.image}
+                          alt="User Avatar"
+                        />
+                        <AvatarFallback>
+                          {session.user.name?.charAt(0) || "U"}
+                        </AvatarFallback>
+                      </Avatar>
+                    )}
+                  </Link>
+
                   <span className="text-base">{session.user.name}</span>
                 </div>
                 <Button

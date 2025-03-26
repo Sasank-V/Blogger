@@ -4,59 +4,55 @@ import { NextResponse } from "next/server";
 import { getCategoryClassifyPrompt, askGemini } from "@/utils/AI";
 
 export async function POST(request: Request) {
-  // Connect to MongoDB
-  await connect_DB();
-
-  // Parse the request body
-  const body = await request.json();
-  const {
-    title,
-    content,
-    author, // expects the User ObjectId string
-    categories = [],
-    tags = [],
-    images = [],
-    isPublished = false,
-  } = body;
-
-  // Basic validation
-  if (!title || !content || !author) {
-    return NextResponse.json(
-      { error: "Missing required fields: title, content, or author" },
-      { status: 400 }
-    );
-  }
-
   try {
-    // Generate a detailed prompt from the post content
-    const prompt = getCategoryClassifyPrompt(content);
-    // Call the Gemini API to get suggested categories and tags
-    const aiResult = await askGemini(prompt);
-    // Append the AI-suggested categories to those passed in from the client.
-    // You can choose to override or merge; here we merge them.
-    const finalCategories = Array.from(
-      new Set([...categories, ...aiResult.categories])
-    );
-    const finalTags = Array.from(new Set([...tags, ...aiResult.tags]));
+    await connect_DB();
 
-    // Create the new post with the merged categories and tags.
+    // Log incoming request
+    const body = await request.json();
+    console.log("📥 Incoming request body:", body);
+
+    const {
+      title,
+      content,
+      author,
+      categories = [],
+      tags = [],
+      images = [],
+      isPublished = false,
+    } = body;
+
+    if (!title || !content || !author) {
+      console.error("⚠️ Validation failed. Missing fields:", {
+        title,
+        content,
+        author,
+      });
+      return NextResponse.json(
+        { error: "Missing required fields: title, content, or author" },
+        { status: 400 }
+      );
+    }
+
+    console.log("✅ All required fields are present.");
+
+    // Prepare data for saving
     const newPost = await Post.create({
       title,
       content,
       author,
-      categories: finalCategories,
-      tags: finalTags,
+      categories,
+      tags,
       images,
       isPublished,
-      // likes, views, commentCount will use default values
     });
 
+    console.log("✅ Post created successfully:", newPost);
     return NextResponse.json(
       { message: "Post created successfully", post: newPost },
       { status: 201 }
     );
-  } catch (error) {
-    console.error("Error creating post:", error);
+  } catch (error: any) {
+    console.error("❌ Error creating post:", error.message || error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
