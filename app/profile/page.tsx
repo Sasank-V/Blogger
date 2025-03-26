@@ -6,20 +6,36 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { useTheme } from "next-themes";
 import {
-  User,
   Mail,
   MapPin,
   Calendar,
   LinkIcon,
   Edit,
   Settings,
-  Image,
   FileText,
-  BookOpen,
+  MessageSquare,
+  Eye,
+  Clock,
+  Moon,
+  Sun,
+  PenTool,
 } from "lucide-react";
 
-interface UserProfile {
+interface BlogPost {
+  id: number;
+  title: string;
+  excerpt: string;
+  date: string;
+  views: number;
+  comments: number;
+  readingTime: string;
+  category: string;
+}
+
+interface BloggerProfile {
   name: string;
   username: string;
   avatar: string;
@@ -28,15 +44,18 @@ interface UserProfile {
   location: string;
   website: string;
   joinDate: string;
-  followers: number;
-  following: number;
-  posts: number;
-  interests: string[];
+  totalPosts: number;
+  totalViews: number;
+  totalComments: number;
+  categories: string[];
+  posts: BlogPost[];
+  drafts: BlogPost[];
 }
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+  const [profile, setProfile] = useState<BloggerProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     // Simulate fetching profile data
@@ -45,19 +64,88 @@ export default function ProfilePage() {
         name: "Alex Johnson",
         username: "@alexjohnson",
         avatar: "/placeholder.svg?height=128&width=128",
-        bio: "Digital content creator and web developer passionate about creating engaging user experiences.",
+        bio: "Tech blogger and web developer sharing insights on modern web development, UI/UX design, and developer productivity.",
         email: "alex.johnson@example.com",
         location: "San Francisco, CA",
         website: "alexjohnson.dev",
         joinDate: "January 2022",
-        followers: 1248,
-        following: 567,
-        posts: 42,
-        interests: ["Web Development", "UI/UX Design", "Photography", "Tech"],
+        totalPosts: 42,
+        totalViews: 128500,
+        totalComments: 3240,
+        categories: [
+          "Web Development",
+          "UI/UX Design",
+          "JavaScript",
+          "React",
+          "Next.js",
+        ],
+        posts: [
+          {
+            id: 1,
+            title: "Getting Started with Next.js 15",
+            excerpt:
+              "A comprehensive guide to the latest features in Next.js 15 and how to leverage them in your projects.",
+            date: "2 days ago",
+            views: 1240,
+            comments: 24,
+            readingTime: "8 min read",
+            category: "Next.js",
+          },
+          {
+            id: 2,
+            title: "Building Accessible UI Components",
+            excerpt:
+              "Learn how to create UI components that are accessible to everyone, including keyboard navigation and screen readers.",
+            date: "1 week ago",
+            views: 3560,
+            comments: 42,
+            readingTime: "12 min read",
+            category: "UI/UX Design",
+          },
+          {
+            id: 3,
+            title: "State Management in 2025",
+            excerpt:
+              "Exploring modern state management solutions and when to use each approach in your applications.",
+            date: "2 weeks ago",
+            views: 5280,
+            comments: 37,
+            readingTime: "10 min read",
+            category: "React",
+          },
+        ],
+        drafts: [
+          {
+            id: 4,
+            title: "Performance Optimization Techniques",
+            excerpt:
+              "Advanced strategies to optimize your web application for better performance and user experience.",
+            date: "Last edited 3 days ago",
+            views: 0,
+            comments: 0,
+            readingTime: "15 min read",
+            category: "Web Development",
+          },
+          {
+            id: 5,
+            title: "Building a Design System from Scratch",
+            excerpt:
+              "A step-by-step guide to creating your own design system that scales with your application.",
+            date: "Last edited 1 week ago",
+            views: 0,
+            comments: 0,
+            readingTime: "18 min read",
+            category: "UI/UX Design",
+          },
+        ],
       });
       setLoading(false);
     }, 1000);
   }, []);
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   if (loading) {
     return (
@@ -81,6 +169,21 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <div className="flex justify-end mb-4">
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={toggleTheme}
+          aria-label="Toggle theme"
+        >
+          {theme === "dark" ? (
+            <Sun className="h-5 w-5" />
+          ) : (
+            <Moon className="h-5 w-5" />
+          )}
+        </Button>
+      </div>
+
       <div className="grid gap-6">
         {/* Profile Header */}
         <Card>
@@ -97,9 +200,9 @@ export default function ProfilePage() {
                 <p className="text-sm mb-4 max-w-md">{profile.bio}</p>
 
                 <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                  {profile.interests.map((interest) => (
-                    <Badge key={interest} variant="secondary">
-                      {interest}
+                  {profile.categories.map((category) => (
+                    <Badge key={category} variant="secondary">
+                      {category}
                     </Badge>
                   ))}
                 </div>
@@ -120,55 +223,57 @@ export default function ProfilePage() {
         </Card>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Followers</CardTitle>
-              <User className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {profile.followers.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                +12% from last month
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Following</CardTitle>
-              <User className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
-                {profile.following.toLocaleString()}
-              </div>
-              <p className="text-xs text-muted-foreground">
-                +5% from last month
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium">Posts</CardTitle>
+              <CardTitle className="text-sm font-medium">Total Posts</CardTitle>
               <FileText className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {profile.posts.toLocaleString()}
+                {profile.totalPosts.toLocaleString()}
               </div>
               <p className="text-xs text-muted-foreground">+3 new this month</p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Total Views</CardTitle>
+              <Eye className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {profile.totalViews.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                +15% from last month
+              </p>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Comments
+              </CardTitle>
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">
+                {profile.totalComments.toLocaleString()}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                +8% from last month
+              </p>
             </CardContent>
           </Card>
         </div>
 
         {/* Profile Details and Content */}
-        <div className="grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 lg:grid-cols-4">
           {/* Profile Details */}
-          <Card className="md:col-span-1">
+          <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle>Profile Details</CardTitle>
             </CardHeader>
@@ -194,70 +299,122 @@ export default function ProfilePage() {
                 <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
                 <span className="text-sm">Joined {profile.joinDate}</span>
               </div>
+
+              <Separator className="my-4" />
+
+              <div>
+                <h3 className="text-sm font-medium mb-2">Categories</h3>
+                <div className="flex flex-wrap gap-2">
+                  {profile.categories.map((category) => (
+                    <Badge key={category} variant="outline">
+                      {category}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
 
           {/* Content Tabs */}
-          <Card className="md:col-span-2">
+          <Card className="lg:col-span-3">
             <CardHeader>
-              <CardTitle>Content</CardTitle>
+              <CardTitle>Blog Content</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="posts">
+              <Tabs defaultValue="published">
                 <TabsList className="mb-4">
-                  <TabsTrigger value="posts">
+                  <TabsTrigger value="published">
                     <FileText className="h-4 w-4 mr-2" />
-                    Posts
+                    Published
                   </TabsTrigger>
-                  <TabsTrigger value="media">
-                    <Image className="h-4 w-4 mr-2" />
-                    Media
+                  <TabsTrigger value="drafts">
+                    <PenTool className="h-4 w-4 mr-2" />
+                    Drafts
                   </TabsTrigger>
-                  <TabsTrigger value="saved">
-                    <BookOpen className="h-4 w-4 mr-2" />
-                    Saved
+                  <TabsTrigger value="comments">
+                    <MessageSquare className="h-4 w-4 mr-2" />
+                    Comments
                   </TabsTrigger>
                 </TabsList>
 
-                <TabsContent value="posts" className="space-y-4">
-                  {[1, 2, 3].map((post) => (
-                    <div key={post} className="p-4 border rounded-lg">
-                      <h3 className="font-medium">Sample Post Title {post}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        This is a preview of post content that would appear in
-                        the feed.
-                      </p>
-                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                        <span>2 days ago</span>
-                        <span>24 likes</span>
-                        <span>8 comments</span>
-                      </div>
-                    </div>
+                <TabsContent value="published" className="space-y-4">
+                  {profile.posts.map((post) => (
+                    <Card key={post.id}>
+                      <CardContent className="p-4">
+                        <div className="flex items-start justify-between">
+                          <div>
+                            <h3 className="font-medium text-lg">
+                              {post.title}
+                            </h3>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {post.excerpt}
+                            </p>
+                          </div>
+                          <Badge>{post.category}</Badge>
+                        </div>
+                        <div className="flex flex-wrap items-center gap-4 mt-4 text-xs text-muted-foreground">
+                          <div className="flex items-center">
+                            <Calendar className="h-3 w-3 mr-1" />
+                            <span>{post.date}</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Eye className="h-3 w-3 mr-1" />
+                            <span>{post.views.toLocaleString()} views</span>
+                          </div>
+                          <div className="flex items-center">
+                            <MessageSquare className="h-3 w-3 mr-1" />
+                            <span>{post.comments} comments</span>
+                          </div>
+                          <div className="flex items-center">
+                            <Clock className="h-3 w-3 mr-1" />
+                            <span>{post.readingTime}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </TabsContent>
 
-                <TabsContent
-                  value="media"
-                  className="grid grid-cols-2 md:grid-cols-3 gap-4"
-                >
-                  {[1, 2, 3, 4, 5, 6].map((item) => (
-                    <div
-                      key={item}
-                      className="aspect-square bg-muted rounded-md overflow-hidden relative"
-                    >
-                      <img
-                        src={`/placeholder.svg?height=200&width=200&text=Image+${item}`}
-                        alt={`Media item ${item}`}
-                        className="object-cover w-full h-full"
-                      />
+                <TabsContent value="drafts" className="space-y-4">
+                  {profile.drafts.length > 0 ? (
+                    profile.drafts.map((draft) => (
+                      <Card key={draft.id}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <h3 className="font-medium text-lg">
+                                {draft.title}
+                              </h3>
+                              <p className="text-sm text-muted-foreground mt-1">
+                                {draft.excerpt}
+                              </p>
+                            </div>
+                            <Badge variant="outline">{draft.category}</Badge>
+                          </div>
+                          <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
+                            <div className="flex items-center">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              <span>{draft.date}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <Clock className="h-3 w-3 mr-1" />
+                              <span>{draft.readingTime}</span>
+                            </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>No drafts yet</p>
                     </div>
-                  ))}
+                  )}
                 </TabsContent>
 
-                <TabsContent value="saved" className="space-y-4">
-                  <p className="text-center text-muted-foreground py-8">
-                    No saved items yet
-                  </p>
+                <TabsContent value="comments" className="space-y-4">
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>Recent comments on your posts will appear here</p>
+                  </div>
                 </TabsContent>
               </Tabs>
             </CardContent>
