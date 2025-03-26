@@ -39,10 +39,6 @@ export async function POST(request: Request) {
     const embedding = await getEmbedding(content);
 
     // Create the new post with the merged categories, tags, and the embedding field
-<<<<<<< HEAD
-
-=======
->>>>>>> 746348e26f9de2d1e8e86f68b24c3da2f2f85f35
     const newPost = await Post.create({
       title,
       content,
@@ -56,10 +52,7 @@ export async function POST(request: Request) {
 
     // Update the vector database with the new post's embedding using the raw content.
     await upsertVectorDB(newPost._id.toString(), embedding, content);
-<<<<<<< HEAD
 
-=======
->>>>>>> 746348e26f9de2d1e8e86f68b24c3da2f2f85f35
     return NextResponse.json(
       { message: "Post created successfully", post: newPost },
       { status: 201 }
