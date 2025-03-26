@@ -31,6 +31,8 @@ export function DashboardStats({ userId }: DashboardStatsProps) {
     return (
       <div className="text-center text-muted-foreground">Loading stats...</div>
     );
+  } else {
+    console.log(stats);
   }
 
   return (

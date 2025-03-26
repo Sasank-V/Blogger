@@ -2,9 +2,9 @@
 import Post from "@/models/post.model";
 import { connect_DB } from "@/utils/DB";
 import { NextResponse } from "next/server";
+import { queryVectorDB } from "@/utils/vectorDB";
 
 export async function GET(request: Request) {
-  // Connect to MongoDB
   await connect_DB();
 
   // Extract the search query from URL parameters
@@ -19,15 +19,16 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Search for posts where the title, content, categories, or tags match the query (case-insensitive)
-    const posts = await Post.find({
-      $or: [
-        { title: { $regex: query, $options: "i" } },
-        { content: { $regex: query, $options: "i" } },
-        { categories: { $regex: query, $options: "i" } },
-        { tags: { $regex: query, $options: "i" } },
-      ],
-    }).sort({ createdAt: -1 });
+    // Query the vector DB to get the top 50 nearest records.
+    const vectorResponse = await queryVectorDB(query);
+
+    // Assume the vector DB response contains a "matches" property.
+    // Extract post IDs from each match.
+    const postIds = vectorResponse.matches.map((match: any) => match.id);
+
+    // Fetch posts from MongoDB whose _id is in the postIds array.
+    // Optionally, you may want to sort the posts in the same order as in postIds.
+    const posts = await Post.find({ _id: { $in: postIds } }).lean();
 
     return NextResponse.json({ posts }, { status: 200 });
   } catch (error) {

@@ -91,12 +91,15 @@ export function PostEditor() {
       author: session.user.id, // User ID
       categories: [finalCategory],
       tags: formData.tags.split(",").map((tag) => tag.trim()),
+
       images: formData.coverImage ? [formData.coverImage] : [], // Array of images
       isPublished: status === "published",
     };
 
     try {
+      // Save draft to local storage (always do this for drafts)
       if (status === "draft") {
+
         if (!navigator.onLine) {
           // Save draft locally
           const draftData = {
@@ -129,6 +132,26 @@ export function PostEditor() {
         toast.success("Post published successfully!");
         router.push("/dashboard");
       }
+
+      // Send the post data to the API
+      const response = await fetch("/api/post/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save post");
+      }
+
+      toast.success(
+        status === "published"
+          ? "Post published successfully!"
+          : "Draft saved successfully!"
+      );
+      router.push("/dashboard");
     } catch (error) {
       console.error(error);
       toast.error("Failed to save your post. Please try again.");

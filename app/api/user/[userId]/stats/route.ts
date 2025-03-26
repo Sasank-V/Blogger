@@ -9,7 +9,7 @@ export async function GET(
   context: { params: { userId: string } }
 ) {
   await connect_DB();
-  const { userId } = context.params;
+  const { userId } = await Promise.resolve(context.params);
 
   try {
     // Aggregate to get total views, likes, and comments

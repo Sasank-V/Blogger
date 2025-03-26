@@ -2,6 +2,8 @@ import Post from "@/models/post.model";
 import { connect_DB } from "@/utils/DB";
 import { NextResponse } from "next/server";
 import { getCategoryClassifyPrompt, askGemini } from "@/utils/AI";
+import { getEmbedding } from "@/utils/embeddings";
+import { upsertVectorDB } from "@/utils/vectorDB";
 
 export async function PATCH(
   request: Request,
@@ -29,7 +31,8 @@ export async function PATCH(
     }
   }
 
-  // If content is updated, get AI-suggested categories and tags and merge them.
+  // If content is updated, get AI-suggested categories and tags and merge them,
+  // then generate a new embedding and upsert it to the vector DB.
   if (filteredUpdates.content) {
     const prompt = getCategoryClassifyPrompt(filteredUpdates.content);
     const aiResult = await askGemini(prompt);
@@ -49,10 +52,19 @@ export async function PATCH(
 
     filteredUpdates.categories = finalCategories;
     filteredUpdates.tags = finalTags;
+
+    // Generate new embedding from the updated content
+    const embedding = await getEmbedding(filteredUpdates.content);
+
+    // Upsert the new embedding into your vector DB using the updated content.
+    await upsertVectorDB(postId, embedding, filteredUpdates.content);
+
+    // Optionally update the post document with the new embedding
+    filteredUpdates.embedding = embedding;
   }
 
   try {
-    // Update the post with the filtered fields
+    // Update the post in MongoDB with the filtered updates
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
       { $set: filteredUpdates },

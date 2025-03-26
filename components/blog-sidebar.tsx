@@ -17,7 +17,7 @@ async function fetchPopularPosts(limit: number = 5): Promise<Post[]> {
     if (!response.ok) throw new Error("Failed to fetch popular posts");
 
     const data = await response.json();
-    return data.posts.map((post: any) => ({
+    return data.map((post: any) => ({
       id: post._id,
       title: post.title,
       slug: post.slug,
