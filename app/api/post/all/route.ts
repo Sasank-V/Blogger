@@ -36,9 +36,10 @@ export async function GET(request: Request) {
 
     // Get total count for pagination
     const totalPosts = await Post.countDocuments(query);
+    const totalPages = Math.ceil(totalPosts / limit); // ✅ Correctly calculate totalPages
 
     return NextResponse.json(
-      { posts, page, limit, totalPosts },
+      { posts, page, limit, totalPages, totalPosts }, // ✅ Return totalPages
       { status: 200 }
     );
   } catch (error) {
