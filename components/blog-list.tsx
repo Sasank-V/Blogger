@@ -30,9 +30,7 @@ export async function BlogList({ category, tag, page }: BlogListProps) {
   return (
     <div className="space-y-8">
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.map((post) => (
-          <BlogPostCard key={post.id} post={post} />
-        ))}
+        {posts && posts.map((post) => <BlogPostCard post={post} />)}
       </div>
       <Pagination currentPage={page} totalPages={totalPages} />
     </div>
