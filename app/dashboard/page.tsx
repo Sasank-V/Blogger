@@ -9,6 +9,7 @@ import { DashboardStats } from "@/components/dashboard-stats";
 import { DashboardTabs } from "@/components/dashboard-tabs";
 import { getUserStats, getUserPosts } from "@/lib/data";
 import type { UserStats, Post } from "@/lib/types";
+import { DashboardPageSkeleton } from "@/components/dashboard-page-skeleton";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
@@ -41,14 +42,19 @@ export default function DashboardPage() {
               const parsed = JSON.parse(draftsRaw);
               // If parsed data is an array, use it; if it's an object, wrap it in an array.
               draftPosts = Array.isArray(parsed) ? parsed : [parsed];
+              // Add draft status to distinguish them from published posts
+              draftPosts = draftPosts.map((draft) => ({
+                ...draft,
+                isDraft: true,
+              }));
             } catch (error) {
               console.error("Error parsing draft posts:", error);
             }
           }
         }
-        // Merge drafts with published posts (drafts come first, if needed)
+
+        // Merge drafts with published posts (drafts come first)
         const combinedPosts = [...draftPosts, ...postsData];
-        console.log(draftPosts);
         setStats(statsData);
         setPosts(combinedPosts);
       } catch (error) {
@@ -58,11 +64,12 @@ export default function DashboardPage() {
         setLoading(false);
       }
     }
+
     fetchDashboardData();
   }, [session, status, router]);
 
   if (loading) {
-    return <div>Loading dashboard...</div>;
+    return <DashboardPageSkeleton />;
   }
 
   return (

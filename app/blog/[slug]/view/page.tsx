@@ -15,12 +15,13 @@ import { RelatedPosts } from "@/components/related-posts";
 import { getPostById, getRelatedPosts } from "@/lib/data";
 import type { Post } from "@/lib/types";
 import LikeButton from "@/components/like-button";
+import { BlogPostSkeleton } from "@/components/post-view-skeleton";
 
 interface BlogPostPageProps {
   params: { slug: string };
 }
 
-export default function BlogPostPage({ params }: BlogPostPageProps) {
+export default function Post({ params }: BlogPostPageProps) {
   const router = useRouter();
   const [post, setPost] = useState<Post | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
@@ -46,7 +47,7 @@ export default function BlogPostPage({ params }: BlogPostPageProps) {
   }, [params.slug]);
 
   if (loading || !post) {
-    return <p>Loading...</p>;
+    return <BlogPostSkeleton />;
   }
 
   return (
