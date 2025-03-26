@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { BlogList } from "@/components/blog-list";
-import { BlogSidebar } from "@/components/blog-sidebar";
+import BlogSidebar from "@/components/blog-sidebar";
 import { BlogFilters } from "@/components/blog-filters";
 import { BlogListSkeleton } from "@/components/blog-list-skeleton";
 
