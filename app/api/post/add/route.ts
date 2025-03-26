@@ -39,12 +39,13 @@ export async function POST(request: Request) {
     const embedding = await getEmbedding(content);
 
     // Create the new post with the merged categories, tags, and the embedding field
+
     const newPost = await Post.create({
       title,
       content,
       author,
-      categories: finalCategories,
-      tags: finalTags,
+      categories,
+      tags,
       images,
       isPublished,
       embedding, // Stored in MongoDB
@@ -57,8 +58,8 @@ export async function POST(request: Request) {
       { message: "Post created successfully", post: newPost },
       { status: 201 }
     );
-  } catch (error) {
-    console.error("Error creating post:", error);
+  } catch (error: any) {
+    console.error("❌ Error creating post:", error.message || error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
