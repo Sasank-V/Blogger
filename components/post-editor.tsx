@@ -4,7 +4,6 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -19,15 +18,14 @@ import TiptapEditor from "@/components/tiptap-editor";
 import { useSession } from "next-auth/react";
 
 export function PostEditor() {
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
-    excerpt: "",
     content: "",
     category: "",
-    customCategory: "", // New field for custom category
+    customCategory: "",
     tags: "",
     coverImage: "",
   });
@@ -40,9 +38,7 @@ export function PostEditor() {
     "Health",
   ];
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -51,7 +47,7 @@ export function PostEditor() {
     setFormData((prev) => ({
       ...prev,
       category: value,
-      customCategory: value === "custom" ? prev.customCategory : "", // Reset if not custom
+      customCategory: value === "custom" ? prev.customCategory : "",
     }));
   };
 
@@ -67,11 +63,42 @@ export function PostEditor() {
         ? formData.customCategory
         : formData.category;
 
-    try {
-      if (!session?.user.id) {
-        toast.warn("Signin to Creat Blogs");
-        return;
+    if (!session?.user.id) {
+      toast.warn("Sign in to create blogs");
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (status === "draft") {
+      // Offline mode: Save draft locally
+      const draftData = {
+        title: formData.title,
+        content: formData.content,
+        author: session.user.id,
+        categories: [finalCategory],
+        tags: formData.tags.split(",").map((tag) => tag.trim()),
+        images: [formData.coverImage],
+        isPublished: false,
+        savedAt: new Date().toISOString(),
+      };
+      try {
+        localStorage.setItem(
+          `draft-${session.user.id}`,
+          JSON.stringify(draftData)
+        );
+        toast.success("Draft saved offline successfully!");
+        router.push("/dashboard");
+      } catch (err) {
+        console.error("Error saving draft:", err);
+        toast.error("Failed to save draft. Please try again.");
+      } finally {
+        setIsSubmitting(false);
       }
+      return;
+    }
+
+    // For publishing, send a network request
+    try {
       const response = await fetch("/api/post/add", {
         method: "POST",
         headers: {
@@ -80,11 +107,11 @@ export function PostEditor() {
         body: JSON.stringify({
           title: formData.title,
           content: formData.content,
-          author: session?.user.id,
-          categories: [finalCategory], // Send the final category (predefined or custom)
+          author: session.user.id,
+          categories: [finalCategory],
           tags: formData.tags.split(",").map((tag) => tag.trim()),
           images: [formData.coverImage],
-          isPublished: status === "published",
+          isPublished: true,
         }),
       });
 
@@ -92,12 +119,10 @@ export function PostEditor() {
         throw new Error("Failed to save post");
       }
 
-      toast.success(
-        status === "published" ? "Post published successfully!" : "Draft saved!"
-      );
+      toast.success("Post published successfully!");
       router.push("/dashboard");
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Failed to save your post. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -119,18 +144,6 @@ export function PostEditor() {
           />
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="excerpt">Excerpt</Label>
-          <Textarea
-            id="excerpt"
-            name="excerpt"
-            placeholder="Brief summary of your post"
-            value={formData.excerpt}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
@@ -142,9 +155,9 @@ export function PostEditor() {
                 <SelectValue placeholder="Select category" />
               </SelectTrigger>
               <SelectContent>
-                {predefinedCategories.map((category) => (
-                  <SelectItem key={category} value={category.toLowerCase()}>
-                    {category}
+                {predefinedCategories.map((cat) => (
+                  <SelectItem key={cat} value={cat.toLowerCase()}>
+                    {cat}
                   </SelectItem>
                 ))}
                 <SelectItem value="custom">+ Add New Category</SelectItem>
@@ -152,7 +165,6 @@ export function PostEditor() {
             </Select>
           </div>
 
-          {/* Custom Category Input (Only Show When "Custom" is Selected) */}
           {formData.category === "custom" && (
             <div className="space-y-2">
               <Label htmlFor="customCategory">New Category</Label>
@@ -162,7 +174,7 @@ export function PostEditor() {
                 placeholder="Enter custom category"
                 value={formData.customCategory}
                 onChange={handleChange}
-                required={formData.category === "custom"}
+                required
               />
             </div>
           )}

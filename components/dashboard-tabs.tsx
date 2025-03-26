@@ -38,14 +38,19 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
 
   const handleDeletePost = async (postId: string) => {
     try {
-      // In a real app, this would be an API call:
-      // await fetch(`/api/posts/${postId}`, { method: 'DELETE' })
+      const res = await fetch(`/api/post/${postId}/delete`, {
+        method: "DELETE",
+      });
 
-      // Update local state
-      setPosts(posts.filter((post) => post.id || post.id !== postId));
+      if (!res.ok) {
+        throw new Error("Failed to delete post");
+      }
 
+      // Update local state by removing the deleted post
+      setPosts(posts.filter((post) => post._id !== postId));
       toast.success("Your post has been deleted successfully.");
     } catch (error) {
+      console.error(error);
       toast.error("Failed to delete the post. Please try again.");
     }
   };
@@ -95,7 +100,8 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
                 </TableRow>
               ) : (
                 publishedPosts.map((post) => (
-                  <TableRow key={post.id || post.id}>
+
+                  <TableRow key={post._id || post.id}>
                     <TableCell className="font-medium">{post.title}</TableCell>
                     <TableCell>
                       <Badge
@@ -118,7 +124,7 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
                           </Link>
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/blog/${post.id || post._id}/edit`}>
+                          <Link href={`/blog/${post._id}/edit`}>
                             <Edit className="h-4 w-4" />
                             <span className="sr-only">Edit</span>
                           </Link>
@@ -142,9 +148,7 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
                             <AlertDialogFooter>
                               <AlertDialogCancel>Cancel</AlertDialogCancel>
                               <AlertDialogAction
-                                onClick={() =>
-                                  handleDeletePost(post.id || post._id)
-                                }
+                                onClick={() => handleDeletePost(post._id)}
                               >
                                 Delete
                               </AlertDialogAction>

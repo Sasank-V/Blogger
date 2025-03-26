@@ -11,18 +11,19 @@ import { Separator } from "@/components/ui/separator";
 import { CommentSection } from "@/components/comment-section";
 import { RelatedPosts } from "@/components/related-posts";
 import { getPostById, getRelatedPosts } from "@/lib/data";
+import type { Post } from "@/lib/types";
 
-interface BlogPostPageProps {
-  params: {
-    slug: string;
-  };
-}
+type Params = Promise<{ slug: string }>;
 
 export async function generateMetadata({
   params,
-}: BlogPostPageProps): Promise<Metadata> {
-  console.log(params.slug);
-  const post = await getPostById(params.slug);
+}: {
+  params: Params;
+}): Promise<Metadata> {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  console.log("Slug from search params:", slug);
+  const post = await getPostById(slug);
 
   if (!post) {
     return {
@@ -35,22 +36,24 @@ export async function generateMetadata({
     title: post.title,
     openGraph: {
       title: post.title,
-      images: [{ url: (post.images.length > 0 && post.images[0]) || "" }],
+      images: [{ url: post.images[0] || "" }],
     },
   };
 }
 
-export default async function BlogPostPage({ params }: BlogPostPageProps) {
-  const post = await getPostById(params.slug);
+export default async function BlogPostPage({ params }: { params: Params }) {
+  const resolvedParams = await params;
+  const slug = resolvedParams.slug;
+  const post: Post | null = await getPostById(slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = await getRelatedPosts(post.id, post.categories[0]);
+  const relatedPosts = await getRelatedPosts(post._id, post.categories[0]);
 
   return (
-    <div className=" px-4 py-12">
+    <div className="px-4 py-12">
       <article className="max-w-4xl mx-auto">
         <div className="space-y-4 text-center mb-8">
           <div className="flex justify-center gap-2">
@@ -63,7 +66,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           <h1 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
             {post.title}
           </h1>
-          <p className="text-xl text-muted-foreground">{post.title}</p>
           <div className="flex items-center justify-center gap-4">
             <div className="flex items-center gap-2">
               <Avatar>
@@ -130,7 +132,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
         </div>
 
-        <CommentSection postId={post.id} />
+        <CommentSection postId={post._id} />
       </article>
 
       <div className="max-w-4xl mx-auto mt-16">

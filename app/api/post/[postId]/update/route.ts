@@ -1,7 +1,7 @@
-// app/api/posts/[postId]/route.ts
 import Post from "@/models/post.model";
 import { connect_DB } from "@/utils/DB";
 import { NextResponse } from "next/server";
+import { getCategoryClassifyPrompt, askGemini } from "@/utils/AI";
 
 export async function PATCH(
   request: Request,
@@ -27,6 +27,28 @@ export async function PATCH(
     if (key in updates) {
       filteredUpdates[key] = updates[key];
     }
+  }
+
+  // If content is updated, get AI-suggested categories and tags and merge them.
+  if (filteredUpdates.content) {
+    const prompt = getCategoryClassifyPrompt(filteredUpdates.content);
+    const aiResult = await askGemini(prompt);
+
+    // Merge client-provided categories/tags with AI suggestions
+    const clientCategories = Array.isArray(filteredUpdates.categories)
+      ? filteredUpdates.categories
+      : [];
+    const clientTags = Array.isArray(filteredUpdates.tags)
+      ? filteredUpdates.tags
+      : [];
+
+    const finalCategories = Array.from(
+      new Set([...clientCategories, ...aiResult.categories])
+    );
+    const finalTags = Array.from(new Set([...clientTags, ...aiResult.tags]));
+
+    filteredUpdates.categories = finalCategories;
+    filteredUpdates.tags = finalTags;
   }
 
   try {

@@ -16,7 +16,7 @@ export interface Author {
 }
 
 export interface Comment {
-  id: string;
+  _id: string;
   content: string;
   createdAt: string;
   updatedAt: string;
@@ -25,7 +25,7 @@ export interface Comment {
 }
 
 export interface Post {
-  id: string; // corresponds to Mongo _id
+  _id: string; // corresponds to Mongo _id
   title: string;
   content: string;
   author: Author; // if populated, it's an object; otherwise, it's the ObjectId as string
@@ -68,22 +68,6 @@ export interface GetPostsParams {
   tag?: string;
   page: number;
   limit: number;
-}
-
-export interface PostData {
-  id: string;
-  title: string;
-  excerpt: string;
-  slug: string;
-  publishedAt: string;
-  viewCount: number;
-  // ... any other fields you need
-  author: {
-    username: string;
-    avatar: string;
-    bio: string;
-  };
-  // etc.
 }
 
 export interface GetPostsResponse {
