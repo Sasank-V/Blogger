@@ -103,7 +103,10 @@ export function MobileNav() {
               ) : (
                 <Link
                   href="/login"
-                  onClick={() => setOpen(false)}
+                  onClick={() => {
+                    signIn("google");
+                    setOpen(false);
+                  }}
                   className="transition-colors hover:text-foreground/80 flex gap-3"
                 >
                   <Image

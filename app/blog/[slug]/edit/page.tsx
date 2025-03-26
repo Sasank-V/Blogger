@@ -1,41 +1,29 @@
+"use client";
+
+import React, { useEffect, useState, use } from "react";
 import type { Metadata } from "next";
-import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { getPostById, updatePost } from "@/lib/data";
+import type { Post } from "@/lib/types";
+import TiptapEditor from "@/components/tiptap-editor";
 
 interface EditBlogProps {
-  params: {
-    slug: string;
-  };
-}
-
-export async function generateMetadata({
-  params,
-}: EditBlogProps): Promise<Metadata> {
-  const post = await getPostById(params.slug);
-
-  if (!post) {
-    return {
-      title: "Post Not Found",
-      description: "The requested blog post could not be found.",
-    };
-  }
-
-  return {
-    title: `Edit: ${post.title}`,
-    description: post.excerpt,
-  };
+  params: Promise<{ slug: string }>;
 }
 
 export default function EditBlog({ params }: EditBlogProps) {
   const router = useRouter();
-  const [post, setPost] = useState<any>(null);
+  const { data: session, status } = useSession();
+  // Unwrap the promise for params using React.use()
+  const resolvedParams = use(params);
+  const slug = resolvedParams.slug;
+
+  const [post, setPost] = useState<Post | null>(null);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [categories, setCategories] = useState<string[]>([]);
@@ -43,22 +31,42 @@ export default function EditBlog({ params }: EditBlogProps) {
 
   useEffect(() => {
     async function fetchPost() {
-      const fetchedPost = await getPostById(params.slug);
+      const fetchedPost = await getPostById(slug);
       if (fetchedPost) {
+        // Check if the current user is the post's author.
+        // Adjust this check based on your data structure.
+        if (
+          session &&
+          session.user &&
+          typeof fetchedPost.author === "object" &&
+          fetchedPost.author._id !== session.user.id
+        ) {
+          router.push(`/blog/${fetchedPost._id}/view`);
+          return;
+        }
         setPost(fetchedPost);
         setTitle(fetchedPost.title);
         setContent(fetchedPost.content);
         setCategories(fetchedPost.categories);
       }
     }
-    fetchPost();
-  }, [params.slug]);
+    if (status !== "loading") {
+      fetchPost();
+    }
+  }, [slug, session, status, router]);
 
   const handleSave = async () => {
+    if (!post) return;
     setIsSaving(true);
-    await updatePost(post.id, { title, content, categories });
-    setIsSaving(false);
-    router.push(`/blog/${post.id}`);
+    try {
+      // Send the updated data via the PATCH route
+      await updatePost(post._id, { title, content, categories });
+      router.push(`/blog/${post._id}/view`);
+    } catch (error) {
+      console.error("Error updating post:", error);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   if (!post) return <p>Loading...</p>;
@@ -70,10 +78,16 @@ export default function EditBlog({ params }: EditBlogProps) {
         <div className="flex items-center gap-4 mb-6">
           <Avatar>
             <AvatarImage src={post.author.avatar} alt={post.author.username} />
-            <AvatarFallback>{post.author.username.charAt(0)}</AvatarFallback>
+            <AvatarFallback>
+              {typeof post.author === "object"
+                ? post.author.username.charAt(0)
+                : "U"}
+            </AvatarFallback>
           </Avatar>
           <div>
-            <p className="font-medium">{post.author.username}</p>
+            <p className="font-medium">
+              {typeof post.author === "object" ? post.author.username : "User"}
+            </p>
           </div>
         </div>
 
@@ -85,12 +99,12 @@ export default function EditBlog({ params }: EditBlogProps) {
           className="mb-4"
         />
 
-        <Textarea
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          placeholder="Write your content here..."
-          className="mb-4 min-h-[200px]"
-        />
+        <div className="mb-4">
+          <TiptapEditor
+            initialContent={content}
+            onChange={(data) => setContent(data)}
+          />
+        </div>
 
         <div className="flex gap-2 mb-4">
           {categories.map((category, index) => (

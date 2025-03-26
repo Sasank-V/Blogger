@@ -95,7 +95,7 @@ export async function updatePost(
   updates: UpdatePostData
 ): Promise<{ message: string; post?: any; error?: string }> {
   try {
-    const response = await fetch(`/api/posts/${postId}/update`, {
+    const response = await fetch(`/api/post/${postId}/update`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",

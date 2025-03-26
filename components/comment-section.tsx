@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "react-toastify";
 import type { Comment } from "@/lib/types";
-import { getPostCommentsByID } from "@/lib/data"; // Fetch function
+import { getPostCommentsByID } from "@/lib/data";
+import { useSession } from "next-auth/react";
 
 interface CommentSectionProps {
   postId: string;
@@ -20,15 +21,15 @@ export function CommentSection({ postId }: CommentSectionProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const { data: session, status } = useSession();
 
   useEffect(() => {
     async function fetchComments() {
       try {
         const fetchedComments = await getPostCommentsByID(postId);
-        console.log(fetchedComments);
         setComments(fetchedComments);
       } catch (err) {
-        console.log(err);
+        console.error(err);
         setError("Failed to load comments.");
       } finally {
         setIsLoading(false);
@@ -46,23 +47,27 @@ export function CommentSection({ postId }: CommentSectionProps) {
     setIsSubmitting(true);
 
     try {
-      const newComment: Comment = {
-        id: `temp-${Date.now()}`,
-        content: commentText,
-        createdAt: new Date().toISOString(),
-        author: {
-          id: "current-user",
-          name: "Current User",
-          username: "currentuser",
-          image: "/placeholder.svg?height=40&width=40",
-        },
-        likes: 0,
-      };
+      const res = await fetch(`/api/post/${postId}/comments/add`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          author: session?.user.id,
+          content: commentText,
+          parentComment: null,
+        }),
+      });
 
+      if (!res.ok) {
+        throw new Error("Failed to post comment");
+      }
+      const data = await res.json();
+      // Assuming the API returns { message: string, comment: Comment }
+      const newComment: Comment = data.comment;
       setComments([newComment, ...comments]);
       setCommentText("");
       toast.success("Your comment has been published successfully.");
     } catch (error) {
+      console.error(error);
       toast.error("Failed to post your comment. Please try again.");
     } finally {
       setIsSubmitting(false);
@@ -93,18 +98,20 @@ export function CommentSection({ postId }: CommentSectionProps) {
         <p className="text-gray-500">No comments yet. Be the first!</p>
       ) : (
         <div className="space-y-6">
-          {comments.map((comment) => (
-            <div key={comment.id} className="flex gap-4">
+          {comments.map((comment, index) => (
+            <div key={comment._id || index} className="flex gap-4">
               <Avatar>
                 <AvatarImage
-                  src={comment.author.image}
-                  alt={comment.author.name}
+                  src={comment.author.avatar}
+                  alt={comment.author.username}
                 />
-                <AvatarFallback>{comment.author.name.charAt(0)}</AvatarFallback>
+                <AvatarFallback>
+                  {comment.author.username.charAt(0)}
+                </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium">{comment.author.name}</span>
+                  <span className="font-medium">{comment.author.username}</span>
                   <span className="text-sm text-muted-foreground">
                     {formatDistanceToNow(new Date(comment.createdAt), {
                       addSuffix: true,
@@ -112,14 +119,6 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   </span>
                 </div>
                 <p className="text-sm">{comment.content}</p>
-                <div className="mt-2">
-                  <Button variant="ghost" size="sm">
-                    Like ({comment.likes})
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    Reply
-                  </Button>
-                </div>
               </div>
             </div>
           ))}
