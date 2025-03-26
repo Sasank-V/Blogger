@@ -16,16 +16,15 @@ interface BlogPageProps {
     category?: string;
     tag?: string;
     page?: string;
+    search?: string; // Add search parameter
   };
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  // Await the searchParams object
-  const resolvedSearchParams = await Promise.resolve(searchParams);
-
-  const category = resolvedSearchParams.category;
-  const tag = resolvedSearchParams.tag;
-  const page = Number(resolvedSearchParams.page) || 1;
+  const category = searchParams.category;
+  const tag = searchParams.tag;
+  const search = searchParams.search || ""; // Get search query
+  const page = Number(searchParams.page) || 1;
 
   return (
     <div className="px-4 py-12">
@@ -34,7 +33,12 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
           <h1 className="text-3xl font-bold mb-6">Blog Posts</h1>
           <BlogFilters />
           <Suspense fallback={<BlogListSkeleton />}>
-            <BlogList category={category} tag={tag} page={page} />
+            <BlogList
+              category={category}
+              tag={tag}
+              search={search}
+              page={page}
+            />
           </Suspense>
         </div>
         <div className="md:w-1/4">

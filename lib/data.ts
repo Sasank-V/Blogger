@@ -16,6 +16,7 @@ export async function getPosts({
   featured = false,
   category,
   tag,
+  search, // Ensure search is included
   page = 1,
   limit = 10,
 }: GetPostsParams): Promise<GetPostsResponse> {
@@ -24,6 +25,7 @@ export async function getPosts({
   params.append("limit", limit.toString());
   if (category) params.append("category", category);
   if (tag) params.append("tag", tag);
+  if (search) params.append("search", search); // ✅ Add search here
 
   // Use an absolute URL by prepending the base URL
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -40,6 +42,7 @@ export async function getPosts({
 export async function getUserStats(userId: string): Promise<UserStats> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   const res = await fetch(`${baseUrl}/api/user/${userId}/stats`);
+  console.log("response", res);
 
   if (!res.ok) {
     throw new Error("Failed to fetch user stats");

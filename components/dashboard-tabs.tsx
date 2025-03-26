@@ -28,6 +28,28 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "react-toastify";
+import { Line, Doughnut } from "react-chartjs-2";
+import {
+  Chart as ChartJS,
+  LineElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Tooltip,
+  Legend,
+} from "chart.js";
+
+// Register required chart elements
+ChartJS.register(
+  LineElement,
+  ArcElement,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  Tooltip,
+  Legend
+);
 
 interface DashboardTabsProps {
   data: Post[];
@@ -46,24 +68,52 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
         throw new Error("Failed to delete post");
       }
 
-      // Update local state by removing the deleted post
       setPosts(posts.filter((post) => post._id !== postId));
-      toast.success("Your post has been deleted successfully.");
+      toast.success("Post deleted successfully.");
     } catch (error) {
       console.error(error);
-      toast.error("Failed to delete the post. Please try again.");
+      toast.error("Failed to delete the post.");
     }
   };
 
-  const publishedPosts = posts.filter((post) => post.isPublished === true);
-  const draftPosts = posts.filter((post) => post.isPublished === false);
+  const publishedPosts = posts.filter((post) => post.isPublished);
+  const draftPosts = posts.filter((post) => !post.isPublished);
 
-  // Helper function to safely format a date string
+  // Format date safely
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
     return isNaN(date.getTime())
       ? "N/A"
       : formatDistanceToNow(date, { addSuffix: true });
+  };
+
+  // Chart: Post Performance (Line Chart)
+  const postPerformanceData = {
+    labels: publishedPosts.map((post) =>
+      new Date(post.createdAt).toLocaleDateString()
+    ),
+    datasets: [
+      {
+        label: "Post Views",
+        data: publishedPosts.map((post) => post.views),
+        backgroundColor: "rgba(59,130,246,0.2)",
+        borderColor: "rgba(59,130,246,1)",
+        borderWidth: 2,
+        pointBackgroundColor: "rgba(59,130,246,1)",
+      },
+    ],
+  };
+
+  // Chart: Audience Demographics (Doughnut Chart)
+  const audienceDataChart = {
+    labels: ["USA", "India", "UK", "Canada"],
+    datasets: [
+      {
+        label: "Audience",
+        data: [40, 30, 20, 10], // Replace with actual data if available
+        backgroundColor: ["#6366F1", "#F59E0B", "#EF4444", "#10B981"],
+      },
+    ],
   };
 
   return (
@@ -76,6 +126,7 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
         <TabsTrigger value="analytics">Analytics</TabsTrigger>
       </TabsList>
 
+      {/* Published Posts */}
       <TabsContent value="published">
         <div className="rounded-md border">
           <Table>
@@ -91,58 +142,46 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
             <TableBody>
               {publishedPosts.length === 0 ? (
                 <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    className="text-center py-6 text-muted-foreground"
-                  >
-                    You don't have any published posts yet.
+                  <TableCell colSpan={5} className="text-center py-6">
+                    No published posts available.
                   </TableCell>
                 </TableRow>
               ) : (
                 publishedPosts.map((post) => (
-
-                  <TableRow key={post._id || post.id}>
-                    <TableCell className="font-medium">{post.title}</TableCell>
+                  <TableRow key={post._id}>
+                    <TableCell>{post.title}</TableCell>
                     <TableCell>
-                      <Badge
-                        variant="outline"
-                        className="bg-green-50 text-green-700 border-green-200"
-                      >
+                      <Badge className="bg-green-50 text-green-700 border-green-200">
                         Published
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(post.createdAt)}
-                    </TableCell>
+                    <TableCell>{formatDate(post.createdAt)}</TableCell>
                     <TableCell>{post.views.toLocaleString()}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Button variant="ghost" size="icon" asChild>
                           <Link href={`/blog/${post._id}/view`}>
                             <Eye className="h-4 w-4" />
-                            <span className="sr-only">View</span>
                           </Link>
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
                           <Link href={`/blog/${post._id}/edit`}>
                             <Edit className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
                           </Link>
                         </Button>
                         <AlertDialog>
                           <AlertDialogTrigger asChild>
                             <Button variant="ghost" size="icon">
                               <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
                             </Button>
                           </AlertDialogTrigger>
                           <AlertDialogContent>
                             <AlertDialogHeader>
-                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+                              <AlertDialogTitle>
+                                Confirm Delete
+                              </AlertDialogTitle>
                               <AlertDialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete your post and remove it from
-                                our servers.
+                                This action cannot be undone.
                               </AlertDialogDescription>
                             </AlertDialogHeader>
                             <AlertDialogFooter>
@@ -165,111 +204,13 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
         </div>
       </TabsContent>
 
-      <TabsContent value="drafts">
-        <div className="rounded-md border">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Title</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Updated</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {draftPosts.length === 0 ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="text-center py-6 text-muted-foreground"
-                  >
-                    You don't have any draft posts.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                draftPosts.map((post) => (
-                  <TableRow key={post.id || post._id}>
-                    <TableCell className="font-medium">{post.title}</TableCell>
-                    <TableCell>
-                      <Badge
-                        variant="outline"
-                        className="bg-amber-50 text-amber-700 border-amber-200"
-                      >
-                        Draft
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {formatDate(post.updatedAt)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/dashboard/edit/${post.id || post._id}`}>
-                            <Edit className="h-4 w-4" />
-                            <span className="sr-only">Edit</span>
-                          </Link>
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <Trash2 className="h-4 w-4" />
-                              <span className="sr-only">Delete</span>
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                This action cannot be undone. This will
-                                permanently delete your draft and remove it from
-                                our servers.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancel</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() =>
-                                  handleDeletePost(post.id || post._id)
-                                }
-                              >
-                                Delete
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
-      </TabsContent>
-
+      {/* Analytics Tab */}
       <TabsContent value="analytics">
         <div className="space-y-8">
           <div className="rounded-md border p-6">
             <h3 className="text-lg font-medium mb-4">Post Performance</h3>
             <div className="h-80 w-full">
-              {/* Chart would go here in a real implementation */}
-              <div className="flex items-center justify-center h-full bg-muted/30 rounded-md">
-                <p className="text-muted-foreground">
-                  Post views over time chart would render here
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-md border p-6">
-            <h3 className="text-lg font-medium mb-4">Audience Demographics</h3>
-            <div className="h-80 w-full">
-              {/* Chart would go here in a real implementation */}
-              <div className="flex items-center justify-center h-full bg-muted/30 rounded-md">
-                <p className="text-muted-foreground">
-                  Audience demographics chart would render here
-                </p>
-              </div>
+              <Line data={postPerformanceData} />
             </div>
           </div>
         </div>

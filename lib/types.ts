@@ -68,6 +68,7 @@ export interface GetPostsParams {
   tag?: string;
   page: number;
   limit: number;
+  search?: string;
 }
 
 export interface GetPostsResponse {

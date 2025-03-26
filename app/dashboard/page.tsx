@@ -50,7 +50,7 @@ export default function DashboardPage() {
   return (
     <div className="px-4 py-12">
       <DashboardHeader user={session!.user} />
-      <DashboardStats stats={stats!} />
+      <DashboardStats stats={stats!} userId={session.user.id} />
       <DashboardTabs data={posts} />
     </div>
   );
