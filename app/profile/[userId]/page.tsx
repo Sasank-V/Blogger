@@ -49,21 +49,6 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="flex justify-end mb-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          aria-label="Toggle theme"
-        >
-          {theme === "dark" ? (
-            <Sun className="h-5 w-5" />
-          ) : (
-            <Moon className="h-5 w-5" />
-          )}
-        </Button>
-      </div>
-
       <Card>
         <CardContent className="p-6">
           <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">

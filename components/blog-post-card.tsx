@@ -60,9 +60,10 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
       alert("Sharing not supported on this browser.");
     }
   };
+  // console.log(post);
 
   return (
-    <div key={post.title}>
+    <div key={post.id}>
       <Card className="overflow-hidden">
         <div className="relative aspect-video">
           <Image

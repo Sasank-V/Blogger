@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { DoorOpen, Menu } from "lucide-react";
+import Image from "next/image";
+import { Menu, DoorOpen } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import Image from "next/image";
 import { signIn, signOut, useSession } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function MobileNav() {
   const [open, setOpen] = useState(false);
@@ -46,80 +47,69 @@ export function MobileNav() {
             >
               Blog
             </Link>
-            <Link
-              href="/categories"
-              onClick={() => setOpen(false)}
-              className="transition-colors hover:text-foreground/80"
-            >
-              Categories
-            </Link>
-            <Link
-              href="/about"
-              onClick={() => setOpen(false)}
-              className="transition-colors hover:text-foreground/80"
-            >
-              About
-            </Link>
-            <div className="border-t mt-4 pt-4">
-              {status === "authenticated" && session?.user ? (
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
-                    {session.user.image && (
-                      <Image
-                        src={session.user.image}
-                        alt="User Avatar"
-                        width={30}
-                        height={30}
-                        className="rounded-full"
-                      />
-                    )}
-                    <span>{session.user.name}</span>
-                  </div>
-                  <Link
-                    href="/dashboard"
-                    onClick={() => setOpen(false)}
-                    className="transition-colors hover:text-foreground/80"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/profile"
-                    onClick={() => setOpen(false)}
-                    className="transition-colors hover:text-foreground/80"
-                  >
-                    Profile
-                  </Link>
-                  <Button
-                    className="text-base flex"
-                    onClick={() => {
-                      setOpen(false);
-                      signOut();
-                    }}
-                  >
-                    <DoorOpen />
-                    Sign Out
-                  </Button>
-                </div>
-              ) : (
+            {status === "authenticated" && session?.user && (
+              <>
                 <Link
-                  href="/login"
-                  onClick={() => {
-                    signIn("google");
-                    setOpen(false);
-                  }}
-                  className="transition-colors hover:text-foreground/80 flex gap-3"
+                  href="/dashboard"
+                  onClick={() => setOpen(false)}
+                  className="transition-colors hover:text-foreground/80"
                 >
-                  <Image
-                    src={"/google.svg"}
-                    alt="Google Logo"
-                    height={20}
-                    width={20}
-                  />
-                  Sign In
+                  Dashboard
                 </Link>
-              )}
-            </div>
+                <Link
+                  href="/profile"
+                  onClick={() => setOpen(false)}
+                  className="transition-colors hover:text-foreground/80"
+                >
+                  Profile
+                </Link>
+              </>
+            )}
           </nav>
+          <div className="border-t mt-4 pt-4 px-7">
+            {status === "authenticated" && session?.user ? (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  {session.user.image && (
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={session.user.image} alt="User Avatar" />
+                      <AvatarFallback>
+                        {session.user.name?.charAt(0) || "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                  )}
+                  <span className="text-base">{session.user.name}</span>
+                </div>
+                <Button
+                  className="text-base flex gap-2"
+                  onClick={() => {
+                    setOpen(false);
+                    signOut();
+                  }}
+                >
+                  <DoorOpen className="h-5 w-5" />
+                  Sign Out
+                </Button>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => {
+                  signIn("google");
+                  setOpen(false);
+                }}
+                className="transition-colors hover:text-foreground/80 flex gap-3"
+              >
+                <Image
+                  src={"/google.svg"}
+                  alt="Google Logo"
+                  height={20}
+                  width={20}
+                />
+                Sign In
+              </Link>
+            )}
+          </div>
         </SheetContent>
       </Sheet>
       <Link href="/" className="flex items-center space-x-2">

@@ -31,8 +31,26 @@ export default function DashboardPage() {
         const userId = session.user.id;
         const statsData = await getUserStats(userId);
         const postsData = await getUserPosts(userId);
+
+        // Fetch drafts from localStorage (if any)
+        let draftPosts: Post[] = [];
+        if (typeof window !== "undefined") {
+          const draftsRaw = localStorage.getItem(`draft-${userId}`);
+          if (draftsRaw) {
+            try {
+              const parsed = JSON.parse(draftsRaw);
+              // If parsed data is an array, use it; if it's an object, wrap it in an array.
+              draftPosts = Array.isArray(parsed) ? parsed : [parsed];
+            } catch (error) {
+              console.error("Error parsing draft posts:", error);
+            }
+          }
+        }
+        // Merge drafts with published posts (drafts come first, if needed)
+        const combinedPosts = [...draftPosts, ...postsData];
+        console.log(draftPosts);
         setStats(statsData);
-        setPosts(postsData);
+        setPosts(combinedPosts);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
         toast.error("Failed to load dashboard data.");

@@ -1,9 +1,11 @@
-import type { Metadata } from "next";
+"use client";
+
+import { useState, useEffect } from "react";
+import { useRouter, notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { formatDistanceToNow } from "date-fns";
-import { Heart, MessageCircle, Share2, Bookmark } from "lucide-react";
+import { MessageCircle, Share2, Bookmark } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,45 +14,40 @@ import { CommentSection } from "@/components/comment-section";
 import { RelatedPosts } from "@/components/related-posts";
 import { getPostById, getRelatedPosts } from "@/lib/data";
 import type { Post } from "@/lib/types";
+import LikeButton from "@/components/like-button";
 
-type Params = Promise<{ slug: string }>;
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Params;
-}): Promise<Metadata> {
-  const resolvedParams = await params;
-  const slug = resolvedParams.slug;
-  console.log("Slug from search params:", slug);
-  const post = await getPostById(slug);
-
-  if (!post) {
-    return {
-      title: "Post Not Found",
-      description: "The requested blog post could not be found.",
-    };
-  }
-
-  return {
-    title: post.title,
-    openGraph: {
-      title: post.title,
-      images: [{ url: post.images[0] || "" }],
-    },
-  };
+interface BlogPostPageProps {
+  params: { slug: string };
 }
 
-export default async function BlogPostPage({ params }: { params: Params }) {
-  const resolvedParams = await params;
-  const slug = resolvedParams.slug;
-  const post: Post | null = await getPostById(slug);
+export default function BlogPostPage({ params }: BlogPostPageProps) {
+  const router = useRouter();
+  const [post, setPost] = useState<Post | null>(null);
+  const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  if (!post) {
-    notFound();
+  useEffect(() => {
+    async function fetchData() {
+      const fetchedPost = await getPostById(params.slug);
+      if (!fetchedPost) {
+        notFound();
+        return;
+      }
+      setPost(fetchedPost);
+
+      const fetchedRelated = await getRelatedPosts(
+        fetchedPost._id,
+        fetchedPost.categories[0]
+      );
+      setRelatedPosts(fetchedRelated);
+      setLoading(false);
+    }
+    fetchData();
+  }, [params.slug]);
+
+  if (loading || !post) {
+    return <p>Loading...</p>;
   }
-
-  const relatedPosts = await getRelatedPosts(post._id, post.categories[0]);
 
   return (
     <div className="px-4 py-12">
@@ -113,11 +110,14 @@ export default async function BlogPostPage({ params }: { params: Params }) {
 
         <div className="flex items-center justify-between py-4 border-t border-b">
           <div className="flex items-center gap-4">
-            <Button variant="ghost" size="sm" className="gap-1">
-              <Heart className="h-5 w-5" />
-              <span>{post.likes}</span>
-            </Button>
-            <Button variant="ghost" size="sm" className="gap-1">
+            {/* LikeButton is a client component that handles toggling like state */}
+            <LikeButton postId={post._id} initialLikes={post.likes} />
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1"
+              onClick={() => router.push(`/blog/${post._id}/view`)}
+            >
               <MessageCircle className="h-5 w-5" />
               <span>{post.commentCount}</span>
             </Button>

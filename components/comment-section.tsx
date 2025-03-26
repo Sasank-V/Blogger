@@ -100,7 +100,7 @@ export function CommentSection({ postId }: CommentSectionProps) {
       ) : (
         <div className="space-y-6">
           {comments.map((comment, index) => (
-            <div key={comment._id || index} className="flex gap-4">
+            <div key={comment._id} className="flex gap-4">
               <Avatar>
                 <AvatarImage
                   src={comment.author.avatar}

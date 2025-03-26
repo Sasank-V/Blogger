@@ -69,58 +69,52 @@ export function PostEditor() {
       return;
     }
 
-    if (status === "draft") {
-      // Offline mode: Save draft locally
-      const draftData = {
-        title: formData.title,
-        content: formData.content,
-        author: session.user.id,
-        categories: [finalCategory],
-        tags: formData.tags.split(",").map((tag) => tag.trim()),
-        images: [formData.coverImage],
-        isPublished: false,
-        savedAt: new Date().toISOString(),
-      };
-      try {
-        localStorage.setItem(
-          `draft-${session.user.id}`,
-          JSON.stringify(draftData)
-        );
-        toast.success("Draft saved offline successfully!");
-        router.push("/dashboard");
-      } catch (err) {
-        console.error("Error saving draft:", err);
-        toast.error("Failed to save draft. Please try again.");
-      } finally {
-        setIsSubmitting(false);
-      }
-      return;
-    }
+    // Build the post data object
+    const postData = {
+      title: formData.title,
+      content: formData.content,
+      author: session.user.id,
+      categories: [finalCategory],
+      tags: formData.tags.split(",").map((tag) => tag.trim()),
+      images: [formData.coverImage],
+      isPublished: status === "published",
+    };
 
-    // For publishing, send a network request
     try {
-      const response = await fetch("/api/post/add", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title: formData.title,
-          content: formData.content,
-          author: session.user.id,
-          categories: [finalCategory],
-          tags: formData.tags.split(",").map((tag) => tag.trim()),
-          images: [formData.coverImage],
-          isPublished: true,
-        }),
-      });
+      if (status === "draft") {
+        // Check if the user is offline
+        if (!navigator.onLine) {
+          // Save draft locally only if offline
+          const draftData = {
+            ...postData,
+            savedAt: new Date().toISOString(),
+          };
+          localStorage.setItem(
+            `draft-${session.user.id}`,
+            JSON.stringify(draftData)
+          );
+          toast.success("Draft saved offline successfully!");
+          router.push("/dashboard");
+        } else {
+          toast.warn("You must be offline to save a draft.");
+        }
+      } else {
+        // For publishing, send the post data to the API
+        const response = await fetch("/api/post/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to save post");
+        if (!response.ok) {
+          throw new Error("Failed to save post");
+        }
+
+        toast.success("Post published successfully!");
+        router.push("/dashboard");
       }
-
-      toast.success("Post published successfully!");
-      router.push("/dashboard");
     } catch (error) {
       console.error(error);
       toast.error("Failed to save your post. Please try again.");

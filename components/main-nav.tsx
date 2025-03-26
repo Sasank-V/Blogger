@@ -29,62 +29,53 @@ export function MainNav() {
         >
           Blog
         </Link>
-        <Link
-          href="/categories"
-          className="transition-colors hover:text-foreground/80 text-foreground/60"
-        >
-          Categories
-        </Link>
-        <Link
-          href="/about"
-          className="transition-colors hover:text-foreground/80 text-foreground/60"
-        >
-          About
-        </Link>
+        {status === "authenticated" && session?.user && (
+          <>
+            <Link
+              href="/dashboard"
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Dashboard
+            </Link>
+            <Link
+              href={`/profile/${session.user.id}`}
+              className="transition-colors hover:text-foreground/80 text-foreground/60"
+            >
+              Profile
+            </Link>
+          </>
+        )}
       </nav>
-      <div className="flex items-center">
-        <nav className="flex items-center gap-2">
-          <ThemeToggle />
-          {status === "authenticated" && session?.user ? (
-            <div className="flex items-center gap-3">
-              {session.user.image && (
-                <Image
-                  src={session.user.image}
-                  alt="User Avatar"
-                  width={30}
-                  height={30}
-                  className="rounded-full"
-                />
-              )}
 
-              <Link
-                href="/dashboard"
-                className="transition-colors hover:text-foreground/80 text-sm font-medium"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href={`/profile/${session.user.id}`}
-                className="transition-colors hover:text-foreground/80 text-sm font-medium"
-              >
-                Profile
-              </Link>
-              <Button size="sm" onClick={() => signOut()}>
-                Sign Out
-              </Button>
-            </div>
-          ) : (
-            <Button variant="ghost" size="sm" onClick={() => signIn("google")}>
+      {/* Right Navigation */}
+      <div className="flex items-center gap-2">
+        <ThemeToggle />
+        {status === "authenticated" && session?.user ? (
+          <div className="flex items-center gap-3">
+            {session.user.image && (
               <Image
-                src={"/google.svg"}
-                alt="Google Logo"
-                height={15}
-                width={15}
+                src={session.user.image}
+                alt="User Avatar"
+                width={30}
+                height={30}
+                className="rounded-full"
               />
-              Sign In
+            )}
+            <Button size="sm" onClick={() => signOut()}>
+              Sign Out
             </Button>
-          )}
-        </nav>
+          </div>
+        ) : (
+          <Button variant="ghost" size="sm" onClick={() => signIn("google")}>
+            <Image
+              src={"/google.svg"}
+              alt="Google Logo"
+              height={15}
+              width={15}
+            />
+            Sign In
+          </Button>
+        )}
       </div>
     </section>
   );

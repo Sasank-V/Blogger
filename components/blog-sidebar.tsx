@@ -12,12 +12,12 @@ interface Post {
 async function fetchPopularPosts(limit: number = 5): Promise<Post[]> {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/api/popular`
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/post/popular`
     );
     if (!response.ok) throw new Error("Failed to fetch popular posts");
 
     const data = await response.json();
-    return data.map((post: any) => ({
+    return data.posts.map((post: any) => ({
       id: post._id,
       title: post.title,
       slug: post.slug,
