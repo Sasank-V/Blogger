@@ -1,22 +1,19 @@
-// app/api/post/popular/route.ts
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connect_DB } from "@/utils/DB";
 import Post from "@/models/post.model";
-import "@/models/user.model";
 
-export async function GET() {
-  await connect_DB();
-
+export async function GET(req: NextRequest) {
   try {
-    const posts = await Post.find({ isPublished: true })
-      .sort({ likes: -1, views: -1 })
-      .limit(5)
-      .populate("author", "username avatar bio")
-      .lean();
+    await connect_DB();
 
-    return NextResponse.json({ posts }, { status: 200 });
+    const popularPosts = await Post.find({ isPublished: true })
+      .sort({ likes: -1, views: -1 })
+      .limit(10)
+      .select("title slug views _id");
+
+    return NextResponse.json(popularPosts);
   } catch (error) {
-    console.error("Error fetching top posts:", error);
+    console.error("Error fetching popular posts:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }

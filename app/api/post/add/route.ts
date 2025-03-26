@@ -2,24 +2,23 @@ import Post from "@/models/post.model";
 import { connect_DB } from "@/utils/DB";
 import { NextResponse } from "next/server";
 import { getCategoryClassifyPrompt, askGemini } from "@/utils/AI";
+import { getEmbedding } from "@/utils/embeddings";
+import { upsertVectorDB } from "@/utils/vectorDB";
 
 export async function POST(request: Request) {
-  // Connect to MongoDB
   await connect_DB();
 
-  // Parse the request body
   const body = await request.json();
   const {
     title,
     content,
-    author, // expects the User ObjectId string
+    author,
     categories = [],
     tags = [],
     images = [],
     isPublished = false,
   } = body;
 
-  // Basic validation
   if (!title || !content || !author) {
     return NextResponse.json(
       { error: "Missing required fields: title, content, or author" },
@@ -28,18 +27,18 @@ export async function POST(request: Request) {
   }
 
   try {
-    // Generate a detailed prompt from the post content
+    // Generate a detailed prompt from the post content and get AI suggestions
     const prompt = getCategoryClassifyPrompt(content);
-    // Call the Gemini API to get suggested categories and tags
     const aiResult = await askGemini(prompt);
-    // Append the AI-suggested categories to those passed in from the client.
-    // You can choose to override or merge; here we merge them.
     const finalCategories = Array.from(
       new Set([...categories, ...aiResult.categories])
     );
     const finalTags = Array.from(new Set([...tags, ...aiResult.tags]));
 
-    // Create the new post with the merged categories and tags.
+    // Generate the embedding for the content by directly passing the content text.
+    const embedding = await getEmbedding(content);
+
+    // Create the new post with the merged categories, tags, and the embedding field
     const newPost = await Post.create({
       title,
       content,
@@ -48,8 +47,11 @@ export async function POST(request: Request) {
       tags: finalTags,
       images,
       isPublished,
-      // likes, views, commentCount will use default values
+      embedding, // Stored in MongoDB
     });
+
+    // Update the vector database with the new post's embedding using the raw content.
+    await upsertVectorDB(newPost._id.toString(), embedding, content);
 
     return NextResponse.json(
       { message: "Post created successfully", post: newPost },

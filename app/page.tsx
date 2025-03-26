@@ -242,7 +242,7 @@ export default function Home() {
                   className="h-14 px-8 text-lg rounded-full shadow-lg shadow-primary/20 transition-transform hover:translate-y-[-2px]"
                   onClick={handleGetStarted}
                 >
-                  <span>
+                  <span className="flex items-center">
                     Get Started <ArrowRight className="ml-2 h-5 w-5" />
                   </span>
                 </Button>

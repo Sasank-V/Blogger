@@ -77,44 +77,41 @@ export function PostEditor() {
       categories: [finalCategory],
       tags: formData.tags.split(",").map((tag) => tag.trim()),
       images: [formData.coverImage],
-      isPublished: status === "published",
+      isPublished: status === "published" ? true : false,
     };
 
     try {
+      // Save draft to local storage (always do this for drafts)
       if (status === "draft") {
-        // Check if the user is offline
-        if (!navigator.onLine) {
-          // Save draft locally only if offline
-          const draftData = {
-            ...postData,
-            savedAt: new Date().toISOString(),
-          };
-          localStorage.setItem(
-            `draft-${session.user.id}`,
-            JSON.stringify(draftData)
-          );
-          toast.success("Draft saved offline successfully!");
-          router.push("/dashboard");
-        } else {
-          toast.warn("You must be offline to save a draft.");
-        }
-      } else {
-        // For publishing, send the post data to the API
-        const response = await fetch("/api/post/add", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(postData),
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to save post");
-        }
-
-        toast.success("Post published successfully!");
-        router.push("/dashboard");
+        const draftData = {
+          ...postData,
+          savedAt: new Date().toISOString(),
+        };
+        localStorage.setItem(
+          `draft-${session.user.id}`,
+          JSON.stringify(draftData)
+        );
       }
+
+      // Send the post data to the API
+      const response = await fetch("/api/post/add", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(postData),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save post");
+      }
+
+      toast.success(
+        status === "published"
+          ? "Post published successfully!"
+          : "Draft saved successfully!"
+      );
+      router.push("/dashboard");
     } catch (error) {
       console.error(error);
       toast.error("Failed to save your post. Please try again.");

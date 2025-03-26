@@ -13,6 +13,7 @@ export interface IPost extends Document {
   images: string[]; // Array of image URLs
   createdAt: Date;
   updatedAt: Date;
+  embedding: number[];
 }
 
 const PostSchema: Schema<IPost> = new Schema(
@@ -26,7 +27,8 @@ const PostSchema: Schema<IPost> = new Schema(
     views: { type: Number, default: 0 },
     isPublished: { type: Boolean, default: false },
     commentCount: { type: Number, default: 0 },
-    images: { type: [String], default: [] }, // Image URLs array
+    images: { type: [String], default: [] },
+    embedding: { type: [Number], default: [] }, // Image URLs array
   },
   { timestamps: true }
 );
