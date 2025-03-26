@@ -48,7 +48,6 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
 
       // Update local state by removing the deleted post
       setPosts(posts.filter((post) => post._id !== postId));
-
       toast.success("Your post has been deleted successfully.");
     } catch (error) {
       console.error(error);
@@ -101,6 +100,7 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
                 </TableRow>
               ) : (
                 publishedPosts.map((post) => (
+
                   <TableRow key={post._id || post.id}>
                     <TableCell className="font-medium">{post.title}</TableCell>
                     <TableCell>

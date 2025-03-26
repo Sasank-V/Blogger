@@ -64,7 +64,7 @@ export function MainNav() {
                 Dashboard
               </Link>
               <Link
-                href="/profile"
+                href={`/profile/${session.user.id}`}
                 className="transition-colors hover:text-foreground/80 text-sm font-medium"
               >
                 Profile

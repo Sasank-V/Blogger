@@ -1,17 +1,22 @@
-// app/api/posts/[postId]/incrementLikes/route.ts
+import { NextRequest, NextResponse } from "next/server";
+import mongoose from "mongoose";
 import Post from "@/models/post.model";
 import { connect_DB } from "@/utils/DB";
-import { NextResponse } from "next/server";
 
-export async function GET(
-  request: Request,
+export async function POST(
+  req: NextRequest,
   { params }: { params: { postId: string } }
 ) {
-  await connect_DB();
-  const { postId } = params;
-
   try {
-    // Increment the 'likes' field by 1
+    await connect_DB();
+    const { postId } = params;
+
+    // Validate postId
+    if (!mongoose.Types.ObjectId.isValid(postId)) {
+      return NextResponse.json({ error: "Invalid Post ID" }, { status: 400 });
+    }
+
+    // Increment the like count
     const updatedPost = await Post.findByIdAndUpdate(
       postId,
       { $inc: { likes: 1 } },
@@ -22,12 +27,12 @@ export async function GET(
       return NextResponse.json({ error: "Post not found" }, { status: 404 });
     }
 
-    return NextResponse.json(
-      { message: "Likes incremented successfully", post: updatedPost },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      message: "Like incremented successfully",
+      likes: updatedPost.likes,
+    });
   } catch (error) {
-    console.error("Error incrementing likes:", error);
+    console.error("Error incrementing like:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
