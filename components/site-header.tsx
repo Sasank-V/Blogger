@@ -5,6 +5,7 @@ import { MainNav } from "@/components/main-nav";
 import { MobileNav } from "@/components/mobile-nav";
 import Image from "next/image";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 
 export function SiteHeader() {
   const { data: session, status } = useSession();
@@ -21,13 +22,15 @@ export function SiteHeader() {
               <>
                 <div className="flex items-center space-x-2">
                   {session.user.image && (
-                    <Image
-                      src={session.user.image}
-                      alt="User Avatar"
-                      width={30}
-                      height={30}
-                      className="rounded-full"
-                    />
+                    <Link href={`/profile/${session.user.id}`}>
+                      <Image
+                        src={session.user.image}
+                        alt="User Avatar"
+                        width={30}
+                        height={30}
+                        className="rounded-full"
+                      />
+                    </Link>
                   )}
                 </div>
                 <Button variant="ghost" size="sm" onClick={() => signOut()}>

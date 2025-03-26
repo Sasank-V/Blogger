@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -12,15 +12,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import dynamic from "next/dynamic";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "react-toastify";
-import TiptapEditor from "@/components/tiptap-editor";
 import { useSession } from "next-auth/react";
+import { EditorState, convertToRaw } from "draft-js";
+import draftToHtml from "draftjs-to-html";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+
+const Editor = dynamic(
+  () => import("react-draft-wysiwyg").then((mod) => mod.Editor),
+  { ssr: false }
+);
 
 export function PostEditor() {
   const { data: session } = useSession();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -58,6 +67,7 @@ export function PostEditor() {
     e.preventDefault();
     setIsSubmitting(true);
 
+    // Get category from user input or default
     const finalCategory =
       formData.category === "custom"
         ? formData.customCategory
@@ -69,28 +79,58 @@ export function PostEditor() {
       return;
     }
 
-    // Build the post data object
+    // Convert DraftJS editor content to HTML
+    const contentHTML = draftToHtml(
+      convertToRaw(editorState.getCurrentContent())
+    );
+
+    // Prepare post data
     const postData = {
       title: formData.title,
-      content: formData.content,
-      author: session.user.id,
+      content: contentHTML, // HTML content
+      author: session.user.id, // User ID
       categories: [finalCategory],
       tags: formData.tags.split(",").map((tag) => tag.trim()),
-      images: [formData.coverImage],
-      isPublished: status === "published" ? true : false,
+
+      images: formData.coverImage ? [formData.coverImage] : [], // Array of images
+      isPublished: status === "published",
     };
 
     try {
       // Save draft to local storage (always do this for drafts)
       if (status === "draft") {
-        const draftData = {
-          ...postData,
-          savedAt: new Date().toISOString(),
-        };
-        localStorage.setItem(
-          `draft-${session.user.id}`,
-          JSON.stringify(draftData)
-        );
+
+        if (!navigator.onLine) {
+          // Save draft locally
+          const draftData = {
+            ...postData,
+            savedAt: new Date().toISOString(),
+          };
+          localStorage.setItem(
+            `draft-${session.user.id}`,
+            JSON.stringify(draftData)
+          );
+          toast.success("Draft saved offline successfully!");
+          router.push("/dashboard");
+        } else {
+          toast.warn("You must be offline to save a draft.");
+        }
+      } else {
+        // Save as published
+        const response = await fetch("/api/post/add", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(postData),
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to save post");
+        }
+
+        toast.success("Post published successfully!");
+        router.push("/dashboard");
       }
 
       // Send the post data to the API
@@ -118,6 +158,10 @@ export function PostEditor() {
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const onEditorStateChange = (newEditorState) => {
+    setEditorState(newEditorState);
   };
 
   return (
@@ -197,11 +241,20 @@ export function PostEditor() {
           <Label htmlFor="content">Content</Label>
           <Card>
             <CardContent className="p-4">
-              <TiptapEditor
-                initialContent={formData.content}
-                onChange={(content) =>
-                  setFormData((prev) => ({ ...prev, content }))
-                }
+              <Editor
+                editorState={editorState}
+                wrapperClassName="demo-wrapper"
+                editorClassName="demo-editor"
+                onEditorStateChange={onEditorStateChange}
+                toolbarClassName="rdw-editor-toolbar"
+                editorStyle={{
+                  height: "300px",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  backgroundColor: "#1a1a1a",
+                  color: "#fff",
+                  border: "1px solid #2e2e2e",
+                }}
               />
             </CardContent>
           </Card>

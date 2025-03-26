@@ -43,8 +43,8 @@ export async function POST(request: Request) {
       title,
       content,
       author,
-      categories: finalCategories,
-      tags: finalTags,
+      categories,
+      tags,
       images,
       isPublished,
       embedding, // Stored in MongoDB
@@ -52,13 +52,12 @@ export async function POST(request: Request) {
 
     // Update the vector database with the new post's embedding using the raw content.
     await upsertVectorDB(newPost._id.toString(), embedding, content);
-
     return NextResponse.json(
       { message: "Post created successfully", post: newPost },
       { status: 201 }
     );
-  } catch (error) {
-    console.error("Error creating post:", error);
+  } catch (error: any) {
+    console.error("❌ Error creating post:", error.message || error);
     return NextResponse.json(
       { error: "Internal Server Error" },
       { status: 500 }
