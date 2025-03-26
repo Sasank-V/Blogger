@@ -1,12 +1,32 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { UserStats } from "@/lib/types";
 import { Eye, Heart, MessageCircle, TrendingUp } from "lucide-react";
+import type { UserStats } from "@/lib/types";
+import { getUserStats } from "@/lib/data"; // Ensure this imports correctly
 
 interface DashboardStatsProps {
-  stats: UserStats | null; // Allow stats to be null initially
+  userId: string;
 }
 
-export function DashboardStats({ stats }: DashboardStatsProps) {
+export function DashboardStats({ userId }: DashboardStatsProps) {
+  const [stats, setStats] = useState<UserStats | null>(null);
+  console.log("User id", userId);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const userStats = await getUserStats(userId);
+        setStats(userStats);
+      } catch (error) {
+        console.error("Error fetching user stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, [userId]);
+
   if (!stats) {
     return (
       <div className="text-center text-muted-foreground">Loading stats...</div>
@@ -15,6 +35,7 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-8">
+      {/* Total Views */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">Total Views</CardTitle>
@@ -24,12 +45,10 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
           <div className="text-2xl font-bold">
             {stats.totalViews?.toLocaleString() || 0}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {stats.viewsChange >= 0 ? "+" : ""}
-            {stats.viewsChange ?? 0}% from last month
-          </p>
         </CardContent>
       </Card>
+
+      {/* Total Likes */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">Total Likes</CardTitle>
@@ -39,12 +58,10 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
           <div className="text-2xl font-bold">
             {stats.totalLikes?.toLocaleString() || 0}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {stats.likesChange >= 0 ? "+" : ""}
-            {stats.likesChange ?? 0}% from last month
-          </p>
         </CardContent>
       </Card>
+
+      {/* Total Comments */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">Total Comments</CardTitle>
@@ -54,12 +71,10 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
           <div className="text-2xl font-bold">
             {stats.totalComments?.toLocaleString() || 0}
           </div>
-          <p className="text-xs text-muted-foreground">
-            {stats.commentsChange >= 0 ? "+" : ""}
-            {stats.commentsChange ?? 0}% from last month
-          </p>
         </CardContent>
       </Card>
+
+      {/* Engagement Rate */}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">Engagement Rate</CardTitle>
@@ -67,10 +82,6 @@ export function DashboardStats({ stats }: DashboardStatsProps) {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{stats.engagementRate ?? 0}%</div>
-          <p className="text-xs text-muted-foreground">
-            {stats.engagementChange >= 0 ? "+" : ""}
-            {stats.engagementChange ?? 0}% from last month
-          </p>
         </CardContent>
       </Card>
     </div>

@@ -6,13 +6,15 @@ interface BlogListProps {
   category?: string;
   tag?: string;
   page: number;
+  search?: string;
 }
 
-export async function BlogList({ category, tag, page }: BlogListProps) {
+export async function BlogList({ category, tag, page, search }: BlogListProps) {
   const { posts, totalPages } = await getPosts({
     category,
     tag,
     page,
+    search,
     limit: 9,
   });
 
