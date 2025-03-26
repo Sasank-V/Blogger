@@ -19,8 +19,9 @@ export interface Comment {
   id: string;
   content: string;
   createdAt: string;
-  author: Author;
+  updatedAt: string;
   likes: number;
+  author: Author;
 }
 
 export interface Post {
@@ -88,4 +89,13 @@ export interface PostData {
 export interface GetPostsResponse {
   posts: Post[];
   totalPages: number;
+}
+
+export interface UpdatePostData {
+  title?: string;
+  content?: string;
+  categories?: string[];
+  tags?: string[];
+  images?: string[];
+  isPublished?: boolean;
 }

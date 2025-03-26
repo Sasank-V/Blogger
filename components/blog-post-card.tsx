@@ -52,7 +52,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
               </p>
             </div>
           </div>
-          <Link href={`/blog/${post.id}`} className="hover:underline">
+          <Link href={`/blog/${post._id}/view`} className="hover:underline">
             <h3 className="text-xl font-bold leading-tight mt-2">
               {post.title}
             </h3>

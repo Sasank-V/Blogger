@@ -42,7 +42,7 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
       // await fetch(`/api/posts/${postId}`, { method: 'DELETE' })
 
       // Update local state
-      setPosts(posts.filter((post) => post.id || post._id !== postId));
+      setPosts(posts.filter((post) => post.id || post.id !== postId));
 
       toast.success("Your post has been deleted successfully.");
     } catch (error) {
@@ -95,7 +95,7 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
                 </TableRow>
               ) : (
                 publishedPosts.map((post) => (
-                  <TableRow key={post.id || post._id}>
+                  <TableRow key={post.id || post.id}>
                     <TableCell className="font-medium">{post.title}</TableCell>
                     <TableCell>
                       <Badge
@@ -112,13 +112,13 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
                     <TableCell>
                       <div className="flex items-center gap-2">
                         <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/blog/${post.slug}`}>
+                          <Link href={`/blog/${post._id}/view`}>
                             <Eye className="h-4 w-4" />
                             <span className="sr-only">View</span>
                           </Link>
                         </Button>
                         <Button variant="ghost" size="icon" asChild>
-                          <Link href={`/dashboard/edit/${post.id || post._id}`}>
+                          <Link href={`/blog/${post.id || post._id}/edit`}>
                             <Edit className="h-4 w-4" />
                             <span className="sr-only">Edit</span>
                           </Link>
