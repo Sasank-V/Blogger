@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const existingUser = await User.findOne({ oauthId: google_id });
     if (existingUser) {
       return NextResponse.json(
-        { message: "User already exists", user: existingUser },
+        { message: "User already exists", user_id: existingUser._id },
         { status: 200 }
       );
     }
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json(
-      { message: "User created", user: newUser },
+      { message: "User created", user_id: newUser._id },
       { status: 201 }
     );
   } catch (error) {

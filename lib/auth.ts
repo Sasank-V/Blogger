@@ -1,17 +1,5 @@
-// import { IUser, User } from "@/models/User";
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-// import { connect_DB } from "@/utils/DB";
-// import { google } from "googleapis";
-// import { OAuth2Client } from "google-auth-library";
-// import { defaultCategories } from "./constants";
-// import { defaultCategories } from "@/lib/constants";
-
-// export const oauth2Client = new google.auth.OAuth2(
-//   process.env.GOOGLE_CLIENT_ID,
-//   process.env.GOOGLE_CLIENT_SECRET,
-//   process.env.REDIRECT_URI // e.g., "http://localhost:3000/oauth2callback"
-// );
 
 export const authConfig: NextAuthOptions = {
   providers: [
@@ -25,30 +13,49 @@ export const authConfig: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {
+    // Sign in callback: send user details to /api/signin to get the user_id
+    async signIn({ account, user }) {
+      if (account && user) {
+        try {
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/user/signin`,
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                google_id: user.id,
+                email: user.email,
+                name: user.name,
+                image: user.image,
+              }),
+            }
+          );
+          const data = await res.json();
+          // Update the user object with the user_id returned by /api/signin
+          user.id = data.user_id;
+          return true;
+        } catch (err) {
+          console.error("Error in signIn callback:", err);
+          return false;
+        }
+      }
+      return true;
+    },
+
+    // JWT callback: store the user_id from the signIn callback in the token
+    async jwt({ token, user }) {
+      if (user) {
+        token.userId = user.id; // Save the user_id returned from /api/signin
+      }
+      return token;
+    },
+
+    // Session callback: attach the user_id from the token to session.user
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.sub as string; // Assign `sub` as `id`
+        session.user.id = token.userId as string;
       }
       return session;
-    },
-    async signIn({ account, user }) {
-      if (!account) return false;
-      await fetch("http://localhost:8080/api/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          google_id: user.id,
-          email: user.email,
-          name: user.name,
-          image: user.image,
-          access_token: account.access_token,
-          refresh_token: account.refresh_token,
-          expires_at: account.expires_at,
-        }),
-      });
-      return true;
     },
   },
 };
