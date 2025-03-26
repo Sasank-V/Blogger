@@ -37,12 +37,6 @@ export function MainNav() {
             >
               Dashboard
             </Link>
-            <Link
-              href={`/profile/${session.user.id}`}
-              className="transition-colors hover:text-foreground/80 text-foreground/60"
-            >
-              Profile
-            </Link>
           </>
         )}
       </nav>
@@ -52,15 +46,18 @@ export function MainNav() {
         <ThemeToggle />
         {status === "authenticated" && session?.user ? (
           <div className="flex items-center gap-3">
-            {session.user.image && (
-              <Image
-                src={session.user.image}
-                alt="User Avatar"
-                width={30}
-                height={30}
-                className="rounded-full"
-              />
-            )}
+            <Link href={`/profile/${session.user.id}`}>
+              {session.user.image && (
+                <Image
+                  src={session.user.image}
+                  alt="User Avatar"
+                  width={30}
+                  height={30}
+                  className="rounded-full"
+                />
+              )}
+            </Link>
+
             <Button size="sm" onClick={() => signOut()}>
               Sign Out
             </Button>

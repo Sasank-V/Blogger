@@ -9,6 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^44.3.0",
+    "@ckeditor/ckeditor5-react": "^9.5.0",
     "@google/genai": "^0.6.1",
     "@pinecone-database/pinecone": "^5.1.1",
     "@radix-ui/react-alert-dialog": "^1.1.6",
@@ -28,11 +30,16 @@
     "@tiptap/pm": "^2.11.5",
     "@tiptap/react": "^2.11.5",
     "@tiptap/starter-kit": "^2.11.5",
+    "@types/dotenv": "^6.1.1",
     "chart.js": "^4.4.8",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "dotenv": "^16.4.7",
+    "draft-js": "^0.11.7",
+    "draftjs-to-html": "^0.9.1",
+    "html-to-draftjs": "^1.5.0",
     "lodash": "^4.17.21",
     "lucide-react": "^0.484.0",
     "mongodb": "^6.15.0",
@@ -43,6 +50,7 @@
     "react": "^19.0.0",
     "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.0.0",
+    "react-draft-wysiwyg": "^1.15.0",
     "react-toastify": "^11.0.5",
     "tailwind-merge": "^3.0.2",
     "tailwindcss-animate": "^1.0.7"
