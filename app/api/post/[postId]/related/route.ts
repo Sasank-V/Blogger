@@ -1,3 +1,7 @@
+import Post from "@/models/post.model";
+import { connect_DB } from "@/utils/DB";
+import { queryVectorDB } from "@/utils/vectorDB";
+
 export async function GET(
   request: Request,
   { params }: { params: { postId: string } }
