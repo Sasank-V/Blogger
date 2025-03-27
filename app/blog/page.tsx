@@ -21,10 +21,11 @@ interface BlogPageProps {
 }
 
 export default async function BlogPage({ searchParams }: BlogPageProps) {
-  const category = searchParams.category;
-  const tag = searchParams.tag;
-  const search = searchParams.search || ""; // Get search query
-  const page = Number(searchParams.page) || 1;
+  const params = await Promise.resolve(searchParams);
+  const category = params.category;
+  const tag = params.tag;
+  const search = params.search || ""; // Get search query
+  const page = Number(params.page) || 1;
 
   return (
     <div className="px-4 py-12">

@@ -49,14 +49,15 @@ export async function upsertVectorDB(
 
 export async function queryVectorDB(
   queryText: string,
+  topK: number = 5, // Default to 5 results
   namespaceName: string = "blog-posts"
 ): Promise<any> {
   const ns = pc.index(indexName, indexHost).namespace(namespaceName);
 
-  // Perform the search query. Adjust the fields array as needed.
+  // Perform the search query with customizable topK value
   const response = await ns.searchRecords({
     query: {
-      topK: 50,
+      topK,
       inputs: { text: queryText },
     },
     fields: ["text", "metadata"],

@@ -16,7 +16,6 @@ export async function getPosts({
   featured = false,
   category,
   tag,
-  search, // Ensure search is included
   page = 1,
   limit = 10,
 }: GetPostsParams): Promise<GetPostsResponse> {
@@ -25,7 +24,6 @@ export async function getPosts({
   params.append("limit", limit.toString());
   if (category) params.append("category", category);
   if (tag) params.append("tag", tag);
-  if (search) params.append("search", search); // ✅ Add search here
 
   // Use an absolute URL by prepending the base URL
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
@@ -42,7 +40,6 @@ export async function getPosts({
 export async function getUserStats(userId: string): Promise<UserStats> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   const res = await fetch(`${baseUrl}/api/user/${userId}/stats`);
-  console.log("response", res);
 
   if (!res.ok) {
     throw new Error("Failed to fetch user stats");
@@ -93,6 +90,7 @@ export async function getPostCommentsByID(postId: string): Promise<Comment[]> {
   return data.comments; // assuming the API returns { comments: Comment[] }
 }
 
+//Done
 export async function updatePost(
   postId: string,
   updates: UpdatePostData
@@ -118,40 +116,27 @@ export async function updatePost(
   }
 }
 
-export async function getRelatedPosts(
-  postId: string,
-  category: string
-): Promise<Post[]> {
-  // Simulate API delay
-  await new Promise((resolve) => setTimeout(resolve, 300));
+//Done
+export async function getRelatedPosts(postId: string): Promise<Post[]> {
+  try {
+    const response = await fetch(`/api/post/${postId}/related`);
 
-  // In a real app, this would fetch related posts from an API or database
-  return Array.from({ length: 3 }).map((_, i) => ({
-    id: `related-${i}`,
-    title: `Related Post ${i + 1}`,
-    slug: `related-post-${i + 1}`,
-    excerpt:
-      "This is a related post based on the category or tags of the current post.",
-    content:
-      "<p>This is a related post based on the category or tags of the current post.</p>",
-    coverImage: `/placeholder.svg?height=300&width=500&text=Related+${i + 1}`,
-    author: {
-      id: "author-2",
-      name: "Jane Smith",
-      username: "janesmith",
-      image: "/placeholder.svg?height=40&width=40&text=JS",
-    },
-    categories: ["Technology", "Web Development"],
-    tags: ["nextjs", "react", "javascript"],
-    publishedAt: new Date(Date.now() - (i + 1) * 86400000).toISOString(),
-    updatedAt: new Date(Date.now() - (i + 1) * 86400000).toISOString(),
-    status: "published",
-    likes: Math.floor(Math.random() * 50),
-    viewCount: Math.floor(Math.random() * 500),
-    commentCount: Math.floor(Math.random() * 10),
-    readingTime: Math.floor(Math.random() * 5) + 2,
-    comments: [],
-  }));
+    if (!response.ok) {
+      throw new Error(`Failed to fetch related posts: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    // Ensure data structure is correct before returning
+    if (!data.relatedPosts || !Array.isArray(data.relatedPosts)) {
+      throw new Error("Invalid response structure");
+    }
+
+    return data.relatedPosts as Post[];
+  } catch (error) {
+    console.error("Error fetching related posts:", error);
+    return [];
+  }
 }
 
 export async function getCategories(): Promise<Category[]> {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter, notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -26,6 +26,9 @@ export default function Post({ params }: BlogPostPageProps) {
   const [post, setPost] = useState<Post | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
+  const [src, setSrc] = useState(
+    "https://imgs.search.brave.com/a9EQT16mZK713_3SenlQxHUVbxa7oqIBt3hryVeKvqI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jb250/ZW50LW1hbmFnZW1l/bnQtZmlsZXMuY2Fu/dmEuY29tL2Nkbi1j/Z2kvaW1hZ2UvZj1h/dXRvLHE9NzAvNTVi/OGRhMjgtNDE0Yy00/N2ViLWI1OGYtNWMw/NTVlNzc2NjBjL21h/Z2ljLXBob3RvX3Jl/c291cmNlc19GcmVl/b25saW5laW1hZ2Vj/b252ZXJ0ZXJfMngu/cG5n"
+  );
 
   useEffect(() => {
     async function fetchData() {
@@ -36,10 +39,8 @@ export default function Post({ params }: BlogPostPageProps) {
       }
       setPost(fetchedPost);
 
-      const fetchedRelated = await getRelatedPosts(
-        fetchedPost._id,
-        fetchedPost.categories[0]
-      );
+      const fetchedRelated = await getRelatedPosts(fetchedPost._id);
+      console.log(fetchedRelated);
       setRelatedPosts(fetchedRelated);
       setLoading(false);
     }
@@ -96,11 +97,16 @@ export default function Post({ params }: BlogPostPageProps) {
 
         <div className="relative aspect-video mb-8">
           <Image
-            src={post.images[0] || "/placeholder.svg?height=600&width=1200"}
+            src={src}
             alt={post.title}
             fill
             className="object-cover rounded-lg"
             priority
+            onError={() =>
+              setSrc(
+                "https://imgs.search.brave.com/a9EQT16mZK713_3SenlQxHUVbxa7oqIBt3hryVeKvqI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jb250/ZW50LW1hbmFnZW1l/bnQtZmlsZXMuY2Fu/dmEuY29tL2Nkbi1j/Z2kvaW1hZ2UvZj1h/dXRvLHE9NzAvNTVi/OGRhMjgtNDE0Yy00/N2ViLWI1OGYtNWMw/NTVlNzc2NjBjL21h/Z2ljLXBob3RvX3Jl/c291cmNlc19GcmVl/b25saW5laW1hZ2Vj/b252ZXJ0ZXJfMngu/cG5n"
+              )
+            }
           />
         </div>
 
@@ -135,11 +141,6 @@ export default function Post({ params }: BlogPostPageProps) {
 
         <CommentSection postId={post._id} />
       </article>
-
-      <div className="max-w-4xl mx-auto mt-16">
-        <h2 className="text-2xl font-bold mb-6">Related Posts</h2>
-        <RelatedPosts posts={relatedPosts} />
-      </div>
     </div>
   );
 }

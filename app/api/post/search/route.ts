@@ -20,7 +20,8 @@ export async function GET(request: Request) {
 
   try {
     // Query the vector DB to get the top 50 nearest records.
-    const vectorResponse = await queryVectorDB(query);
+    const vectorResponse = await queryVectorDB(query, 50);
+    console.log(vectorResponse);
 
     // Assume the vector DB response contains a "matches" property.
     // Extract post IDs from each match.

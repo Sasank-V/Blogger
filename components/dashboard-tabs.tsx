@@ -277,9 +277,10 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
 
       {/* Analytics Tab */}
       <TabsContent value="analytics" className="w-full">
-        <div className=" flex justify-evenly w-full mx-6">
+
+        <div className=" grid grid-cols-1 md:grid-cols-2 gap-3 mx-6">
           {/* Post Performance (Line Chart) */}
-          <div className="rounded-md border p-6 w-1/2">
+          <div className="rounded-md border p-6 ">
             <h3 className="text-lg font-medium mb-4">Post Performance</h3>
             <div className="h-80 w-full">
               <Line data={postPerformanceData} />
@@ -287,7 +288,7 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
           </div>
 
           {/* Post Engagement (Bar Chart) */}
-          <div className="rounded-md border p-6 w-1/2">
+          <div className="rounded-md border p-6 ">
             <h3 className="text-lg font-medium mb-4">Post Engagement</h3>
             <div className="h-80 w-full">
               <Bar data={postEngagementData} />
