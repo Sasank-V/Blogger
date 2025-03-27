@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { useRouter, notFound } from "next/navigation";
+import {
+  useRouter,
+  notFound,
+  useSearchParams,
+  useParams,
+} from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
@@ -17,11 +22,9 @@ import type { Post } from "@/lib/types";
 import LikeButton from "@/components/like-button";
 import { BlogPostSkeleton } from "@/components/post-view-skeleton";
 
-interface BlogPostPageProps {
-  params: { slug: string };
-}
-
-export default function Post({ params }: BlogPostPageProps) {
+export default function Post() {
+  const params = useParams();
+  // console.log(params)
   const router = useRouter();
   const [post, setPost] = useState<Post | null>(null);
   const [relatedPosts, setRelatedPosts] = useState<Post[]>([]);
