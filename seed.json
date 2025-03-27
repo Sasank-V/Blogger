@@ -1,6 +1,5 @@
 [
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f11" },
     "title": "A Day in the Mountains",
     "content": "<p>Exploring the beauty of the mountains during summer.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -17,7 +16,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e3890109a54efc067a6fd0" },
     "title": "City Life",
     "content": "<p>The hustle and bustle of urban living.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -34,7 +32,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f13" },
     "title": "The Serene Beach",
     "content": "<p>Relaxing on the sandy shores with a view of the ocean.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -51,7 +48,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f14" },
     "title": "Delicious Food",
     "content": "<p>A guide to the best restaurants in town.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -68,7 +64,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f15" },
     "title": "Art and Culture",
     "content": "<p>Exploring the rich culture and art communities globally.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -85,7 +80,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f16" },
     "title": "Space Exploration",
     "content": "<p>The latest advancements in space technology.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -102,7 +96,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f17" },
     "title": "Wildlife Photography",
     "content": "<p>Capturing the beauty of wildlife in their natural habitats.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -119,7 +112,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f18" },
     "title": "The Mystical Forest",
     "content": "<p>A journey through enchanted woodlands.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -136,7 +128,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f19" },
     "title": "Modern Architecture",
     "content": "<p>A look at innovative building designs around the world.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -153,7 +144,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f20" },
     "title": "Travel Diaries",
     "content": "<p>The essential guide for travel enthusiasts.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -170,7 +160,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f21" },
     "title": "Mindful Meditation",
     "content": "<p>Practicing mindfulness in the modern world.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -187,7 +176,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f22" },
     "title": "Fitness Journey",
     "content": "<p>Transforming your body through persistence and dedication.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -204,7 +192,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f23" },
     "title": "The Joy of Cooking",
     "content": "<p>Discovering the pleasures of home cooking.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -221,7 +208,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f24" },
     "title": "Gardening Tips",
     "content": "<p>How to grow your own flowers and vegetables.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -238,7 +224,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f25" },
     "title": "The World of Fashion",
     "content": "<p>Latest fashion trends and styles from around the globe.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -255,7 +240,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f26" },
     "title": "Tech Innovations",
     "content": "<p>The latest breakthroughs in technology.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -272,7 +256,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f27" },
     "title": "Photography Essentials",
     "content": "<p>Tips for mastering photography skills.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -289,7 +272,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f28" },
     "title": "Healthy Eating",
     "content": "<p>Incorporating healthy choices into your diet.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -306,7 +288,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f29" },
     "title": "Sustainable Living",
     "content": "<p>Embracing eco-friendly choices.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -323,7 +304,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f30" },
     "title": "Cultural Festivals",
     "content": "<p>Exploring various cultural festivals worldwide.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -340,7 +320,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f31" },
     "title": "Mountain Climbing",
     "content": "<p>The thrill of reaching the top.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -357,7 +336,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f32" },
     "title": "The Art of Writing",
     "content": "<p>Improving your writing skills.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -374,7 +352,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f33" },
     "title": "Artisanal Crafts",
     "content": "<p>Showcasing handmade crafts from local artisans.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -391,7 +368,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f34" },
     "title": "Business Strategies",
     "content": "<p>Effective strategies for modern businesses.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -408,7 +384,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f35" },
     "title": "Understanding SEO",
     "content": "<p>Basic principles of Search Engine Optimization.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -425,7 +400,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f36" },
     "title": "Home Decor Ideas",
     "content": "<p>Transform your living space with simple decor tips.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -442,7 +416,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f37" },
     "title": "Street Art",
     "content": "<p>Exploring the creativity found in urban environments.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -459,7 +432,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f38" },
     "title": "Remote Work Tips",
     "content": "<p>How to be productive while working from home.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -476,7 +448,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f39" },
     "title": "Content Marketing",
     "content": "<p>Effective content strategies for brands.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -493,7 +464,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f40" },
     "title": "The Beauty of Winter",
     "content": "<p>Capturing the essence of winter landscapes.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -510,7 +480,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f41" },
     "title": "Building a Startup",
     "content": "<p>Essential tips for budding entrepreneurs.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -527,7 +496,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f42" },
     "title": "Digital Nomading",
     "content": "<p>Living and working remotely around the world.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -544,7 +512,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f43" },
     "title": "Exploring Cuisines",
     "content": "<p>A journey through various culinary traditions.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -561,7 +528,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f44" },
     "title": "The Science of Happiness",
     "content": "<p>Understanding psychological principles behind happiness.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -578,7 +544,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f45" },
     "title": "Yoga Practices",
     "content": "<p>Incorporating yoga into your daily routine.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
@@ -595,7 +560,6 @@
     "generatedData": "Populated with meaningful data"
   },
   {
-    "_id": { "$oid": "67e5a2495f57bb8cc26e2f46" },
     "title": "Innovative Startups",
     "content": "<p>Spotlighting startups that are changing the game.</p>",
     "author": { "$oid": "67e3890109a54efc067a6fd0" },
