@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, use } from "react";
 import { useRouter, notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -36,10 +36,8 @@ export default function Post({ params }: BlogPostPageProps) {
       }
       setPost(fetchedPost);
 
-      const fetchedRelated = await getRelatedPosts(
-        fetchedPost._id,
-        fetchedPost.categories[0]
-      );
+      const fetchedRelated = await getRelatedPosts(fetchedPost._id);
+      console.log(fetchedRelated);
       setRelatedPosts(fetchedRelated);
       setLoading(false);
     }

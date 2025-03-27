@@ -31,7 +31,7 @@ async function fetchPopularPosts(limit: number = 5): Promise<Post[]> {
 
 export default async function BlogSidebar() {
   const popularPosts = await fetchPopularPosts(5);
-  console.log("Popular Posts:", popularPosts);
+  // console.log("Popular Posts:", popularPosts);
 
   return (
     <div className="space-y-6">
