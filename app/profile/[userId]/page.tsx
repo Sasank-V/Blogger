@@ -22,6 +22,7 @@ import {
   LinkIcon,
   PenTool,
 } from "lucide-react";
+import { BlogPageSkeleton } from "@/components/blog-page-skeleton";
 
 export default function ProfilePage() {
   const { data: session, status } = useSession();
@@ -30,11 +31,7 @@ export default function ProfilePage() {
   const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
   if (status === "loading") {
-    return (
-      <div className="container mx-auto py-8 text-center text-muted-foreground">
-        Loading profile...
-      </div>
-    );
+    return { BlogPageSkeleton };
   }
 
   if (!session || !session.user) {

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useState, use } from "react";
@@ -11,7 +10,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getPostById, updatePost } from "@/lib/data";
 import type { Post } from "@/lib/types";
-import TiptapEditor from "@/components/tiptap-editor";
+import dynamic from "next/dynamic";
+import { EditorState, convertFromRaw, convertToRaw } from "draft-js";
+import draftToHtml from "draftjs-to-html";
+import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+
+// Load Draft.js Editor dynamically
+const Editor = dynamic(
+  () => import("react-draft-wysiwyg").then((mod) => mod.Editor),
+  { ssr: false }
+);
 
 interface EditBlogProps {
   params: Promise<{ slug: string }>;
@@ -20,13 +28,12 @@ interface EditBlogProps {
 export default function EditBlog({ params }: EditBlogProps) {
   const router = useRouter();
   const { data: session, status } = useSession();
-  // Unwrap the promise for params using React.use()
   const resolvedParams = use(params);
   const slug = resolvedParams.slug;
 
   const [post, setPost] = useState<Post | null>(null);
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [editorState, setEditorState] = useState(EditorState.createEmpty());
   const [categories, setCategories] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -34,8 +41,6 @@ export default function EditBlog({ params }: EditBlogProps) {
     async function fetchPost() {
       const fetchedPost = await getPostById(slug);
       if (fetchedPost) {
-        // Check if the current user is the post's author.
-        // Adjust this check based on your data structure.
         if (
           session &&
           session.user &&
@@ -47,7 +52,11 @@ export default function EditBlog({ params }: EditBlogProps) {
         }
         setPost(fetchedPost);
         setTitle(fetchedPost.title);
-        setContent(fetchedPost.content);
+
+        // Convert HTML content to DraftJS raw content
+        const contentBlock = convertFromRaw(JSON.parse(fetchedPost.content));
+        setEditorState(EditorState.createWithContent(contentBlock));
+
         setCategories(fetchedPost.categories);
       }
     }
@@ -60,14 +69,28 @@ export default function EditBlog({ params }: EditBlogProps) {
     if (!post) return;
     setIsSaving(true);
     try {
-      // Send the updated data via the PATCH route
-      await updatePost(post._id, { title, content, categories });
+      // Convert DraftJS content to HTML
+      const contentHTML = draftToHtml(
+        convertToRaw(editorState.getCurrentContent())
+      );
+
+      // Send updated data via PATCH request
+      await updatePost(post._id, {
+        title,
+        content: JSON.stringify(convertToRaw(editorState.getCurrentContent())), // Save as raw content
+        categories,
+      });
+
       router.push(`/blog/${post._id}/view`);
     } catch (error) {
       console.error("Error updating post:", error);
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const onEditorStateChange = (newEditorState) => {
+    setEditorState(newEditorState);
   };
 
   if (!post) return <p>Loading...</p>;
@@ -101,10 +124,23 @@ export default function EditBlog({ params }: EditBlogProps) {
         />
 
         <div className="mb-4">
-          <TiptapEditor
-            initialContent={content}
-            onChange={(data) => setContent(data)}
-          />
+          <div className="border border-gray-700 rounded-md p-4 bg-black">
+            <Editor
+              editorState={editorState}
+              wrapperClassName="demo-wrapper"
+              editorClassName="demo-editor"
+              onEditorStateChange={onEditorStateChange}
+              toolbarClassName="rdw-editor-toolbar"
+              editorStyle={{
+                height: "300px",
+                padding: "10px",
+                borderRadius: "8px",
+                backgroundColor: "#1a1a1a",
+                color: "#fff",
+                border: "1px solid #2e2e2e",
+              }}
+            />
+          </div>
         </div>
 
         <div className="flex gap-2 mb-4">
