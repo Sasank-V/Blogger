@@ -12,7 +12,7 @@ export async function GET(
   const { userId } = await Promise.resolve(context.params);
 
   try {
-    // Aggregate to get total views, likes, and comments
+    // Aggregate to get total views, likes, comments, and posts
     const summaryAgg = await Post.aggregate([
       { $match: { author: new mongoose.Types.ObjectId(userId) } },
       {
@@ -21,14 +21,17 @@ export async function GET(
           totalLikes: { $sum: "$likes" },
           totalViews: { $sum: "$views" },
           totalComments: { $sum: "$commentCount" },
+          totalPosts: { $sum: 1 }, // Count total posts
         },
       },
     ]);
 
+    // Extract stats from aggregation results
     const {
       totalLikes = 0,
       totalViews = 0,
       totalComments = 0,
+      totalPosts = 0,
     } = summaryAgg[0] || {};
 
     // Calculate engagement rate: (likes + comments) / views * 100
@@ -37,7 +40,7 @@ export async function GET(
       : 0;
 
     return NextResponse.json(
-      { totalViews, totalLikes, engagementRate },
+      { totalPosts, totalViews, totalLikes, totalComments, engagementRate },
       { status: 200 }
     );
   } catch (error) {
