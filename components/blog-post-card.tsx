@@ -23,6 +23,9 @@ interface BlogPostCardProps {
 export function BlogPostCard({ post }: BlogPostCardProps) {
   const [likes, setLikes] = useState(post.likes);
   const [liked, setLiked] = useState(false);
+  const [src, setSrc] = useState(
+    "https://imgs.search.brave.com/a9EQT16mZK713_3SenlQxHUVbxa7oqIBt3hryVeKvqI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jb250/ZW50LW1hbmFnZW1l/bnQtZmlsZXMuY2Fu/dmEuY29tL2Nkbi1j/Z2kvaW1hZ2UvZj1h/dXRvLHE9NzAvNTVi/OGRhMjgtNDE0Yy00/N2ViLWI1OGYtNWMw/NTVlNzc2NjBjL21h/Z2ljLXBob3RvX3Jl/c291cmNlc19GcmVl/b25saW5laW1hZ2Vj/b252ZXJ0ZXJfMngu/cG5n"
+  );
   const router = useRouter();
 
   // Toggle Like Function
@@ -60,6 +63,7 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
       alert("Sharing not supported on this browser.");
     }
   };
+
   // console.log(post);
 
   return (
@@ -67,10 +71,15 @@ export function BlogPostCard({ post }: BlogPostCardProps) {
       <Card className="overflow-hidden">
         <div className="relative aspect-video">
           <Image
-            src={post.images[0] || "/placeholder.svg?height=300&width=600"}
+            src={src}
             alt={post.title}
             fill
             className="object-cover"
+            onError={() =>
+              setSrc(
+                "https://imgs.search.brave.com/a9EQT16mZK713_3SenlQxHUVbxa7oqIBt3hryVeKvqI/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9jb250/ZW50LW1hbmFnZW1l/bnQtZmlsZXMuY2Fu/dmEuY29tL2Nkbi1j/Z2kvaW1hZ2UvZj1h/dXRvLHE9NzAvNTVi/OGRhMjgtNDE0Yy00/N2ViLWI1OGYtNWMw/NTVlNzc2NjBjL21h/Z2ljLXBob3RvX3Jl/c291cmNlc19GcmVl/b25saW5laW1hZ2Vj/b252ZXJ0ZXJfMngu/cG5n"
+              )
+            }
           />
         </div>
         <CardHeader>
