@@ -53,7 +53,7 @@ export function BlogFilters() {
     setSearchQuery("");
     setCategory("");
     setDateFilter("");
-    router.push("/blog");
+    router.push("/blog?query");
   };
 
   return (

@@ -106,9 +106,6 @@ export function CommentSection({ postId }: CommentSectionProps) {
                   src={comment.author.avatar}
                   alt={comment.author.username}
                 />
-                <AvatarFallback>
-                  {comment.author.username.charAt(0)}
-                </AvatarFallback>
               </Avatar>
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
