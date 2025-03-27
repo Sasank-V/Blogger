@@ -277,6 +277,7 @@ export function DashboardTabs({ data }: DashboardTabsProps) {
 
       {/* Analytics Tab */}
       <TabsContent value="analytics" className="w-full">
+
         <div className=" grid grid-cols-1 md:grid-cols-2 gap-3 mx-6">
           {/* Post Performance (Line Chart) */}
           <div className="rounded-md border p-6 ">
