@@ -91,24 +91,10 @@ export default function ProfilePage() {
               <p className="text-muted-foreground mb-2">{user.email}</p>
 
               {/* Categories/Tags */}
-              <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                {user.categories?.length ? (
-                  user.categories.map((category: string) => (
-                    <Badge key={category} variant="secondary">
-                      {category}
-                    </Badge>
-                  ))
-                ) : (
-                  <Badge variant="outline">No categories</Badge>
-                )}
-              </div>
             </div>
 
             {/* Action Buttons */}
             <div className="flex gap-2">
-              <Button variant="outline" size="sm">
-                <Edit className="h-4 w-4 mr-2" /> Edit Profile
-              </Button>
               <Button variant="ghost" size="sm">
                 <Settings className="h-4 w-4" />
               </Button>

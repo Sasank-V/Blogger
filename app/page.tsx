@@ -16,6 +16,7 @@ import { FeaturedPosts } from "@/components/featured-posts";
 import { ArrowRight, Edit, Users, BarChart3 } from "lucide-react";
 import type { Post } from "@/lib/types";
 import { signIn, useSession } from "next-auth/react";
+import { SkeletonFeaturedPosts } from "@/components/landing-page";
 
 export default function Home() {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -50,7 +51,7 @@ export default function Home() {
   }, []);
 
   if (loading) {
-    return <p>Loading...</p>;
+    return <SkeletonFeaturedPosts />;
   }
 
   return (
